@@ -209,8 +209,8 @@
       "topics": ["recruiter", "agency"],
       "title_en": "Check the agency's license",
       "title_fil": "I-check ang lisensya ng ahensya",
-      "body_en": "Licensed agencies are listed on the DMW website (dmw.gov.ph). Check the exact name and license status when you have internet, and keep a screenshot. Kontrata cannot verify licenses offline.",
-      "body_fil": "Nakalista sa website ng DMW (dmw.gov.ph) ang mga lisensyadong ahensya. I-check ang eksaktong pangalan at status kapag may internet, at mag-screenshot. Hindi ito kayang i-verify ng Kontrata nang offline.",
+      "body_en": "Licensed agencies are listed on the DMW website (dmw.gov.ph). Check the exact name and license status when you have internet, and keep a screenshot. LakbAI cannot verify licenses offline.",
+      "body_fil": "Nakalista sa website ng DMW (dmw.gov.ph) ang mga lisensyadong ahensya. I-check ang eksaktong pangalan at status kapag may internet, at mag-screenshot. Hindi ito kayang i-verify ng LakbAI nang offline.",
       "source": {"label": "DMW licensed agencies list", "url": "https://dmw.gov.ph"}
     },
     {
@@ -269,8 +269,8 @@
       "topics": ["evidence", "help"],
       "title_en": "Keeping your evidence safe on your phone",
       "title_fil": "Pag-iingat ng ebidensya sa phone mo",
-      "body_en": "Some employers check or take workers' phones. Lock Kontrata with a PIN, use Quick exit if someone comes near, and send a copy of your report to someone you trust only when it is safe. Kontrata never uploads anything on its own.",
-      "body_fil": "May mga employer na tumitingin o kumukuha ng phone ng manggagawa. I-lock ang Kontrata gamit ang PIN, gamitin ang Quick exit kung may lumapit, at magpadala lang ng kopya sa taong pinagkakatiwalaan kapag ligtas. Walang ina-upload ang Kontrata nang kusa.",
+      "body_en": "Some employers check or take workers' phones. Lock LakbAI with a PIN, use Quick exit if someone comes near, and send a copy of your report to someone you trust only when it is safe. LakbAI never uploads anything on its own.",
+      "body_fil": "May mga employer na tumitingin o kumukuha ng phone ng manggagawa. I-lock ang LakbAI gamit ang PIN, gamitin ang Quick exit kung may lumapit, at magpadala lang ng kopya sa taong pinagkakatiwalaan kapag ligtas. Walang ina-upload ang LakbAI nang kusa.",
       "source": {"label": "Digital privacy guide for migrant domestic workers", "url": "https://domesticworkerprivacy.github.io/"}
     },
     {

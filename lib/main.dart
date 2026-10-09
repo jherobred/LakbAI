@@ -13,5 +13,5 @@ Future<void> main() async {
   await KnowledgeBase.load();
   // Model loading continues in the background; the UI never waits on it.
   await AiService.instance.init(app);
-  runApp(KontrataApp(state: app));
+  runApp(LakbAIApp(state: app));
 }

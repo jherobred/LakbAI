@@ -8,8 +8,8 @@ Built for AppBuildersPH Hackathon 2026 (theme: Local AI), 9–10 October 2026.
 
 | Platform | Download | Install |
 |---|---|---|
-| **Android 11+** (64-bit phones) | [**kontrata-android.apk**](https://github.com/jherobred/kontrata/releases/latest/download/kontrata-android.apk) | Open the file on your phone, allow **Install unknown apps** for your browser or Files app, then tap **Install**. If Play Protect warns about an unknown developer, tap **Install anyway**. This is a hackathon build. |
-| **iOS 16+** | [**kontrata-ios-unsigned.ipa**](https://github.com/jherobred/kontrata/releases/latest/download/kontrata-ios-unsigned.ipa) | Apple does not allow installing unsigned apps directly. Re-sign it with your Apple ID using [AltStore](https://altstore.io) or [Sideloadly](https://sideloadly.io), or build from source in Xcode (see [iOS](#ios)). |
+| **Android 11+** (64-bit phones) | [**lakbai-android.apk**](https://github.com/jherobred/kontrata/releases/latest/download/lakbai-android.apk) | Open the file on your phone, allow **Install unknown apps** for your browser or Files app, then tap **Install**. If Play Protect warns about an unknown developer, tap **Install anyway**. This is a hackathon build. |
+| **iOS 16+** | [**lakbai-ios-unsigned.ipa**](https://github.com/jherobred/kontrata/releases/latest/download/lakbai-ios-unsigned.ipa) | Apple does not allow installing unsigned apps directly. Re-sign it with your Apple ID using [AltStore](https://altstore.io) or [Sideloadly](https://sideloadly.io), or build from source in Xcode (see [iOS](#ios)). |
 
 All builds are on the [Releases page](https://github.com/jherobred/kontrata/releases). The AI model (Qwen3 0.6B) and the voice model (Whisper base) are inside the installer, so LakbAI works in airplane mode from the first launch with nothing else to download.
 

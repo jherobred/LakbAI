@@ -149,7 +149,7 @@ class SettingsScreen extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.logout_rounded),
                     title: Text(tr(context, 'Quick exit', 'Mabilis na labas'), style: const TextStyle(fontWeight: FontWeight.w700)),
-                    subtitle: Text(tr(context, 'The red door icon on the home screen closes Kontrata instantly.', 'Ang pulang icon sa home screen ay agad na nagsasara ng Kontrata.')),
+                    subtitle: Text(tr(context, 'The red door icon on the home screen closes LakbAI instantly.', 'Ang pulang icon sa home screen ay agad na nagsasara ng LakbAI.')),
                   ),
                   ListTile(
                     leading: Icon(Icons.delete_forever_rounded, color: t.danger),
@@ -183,7 +183,7 @@ class SettingsScreen extends StatelessWidget {
                   Row(children: [
                     const KLogo(size: 36),
                     const SizedBox(width: 10),
-                    Text('Kontrata', style: Theme.of(context).textTheme.titleLarge),
+                    Text('LakbAI', style: Theme.of(context).textTheme.titleLarge),
                   ]),
                   const SizedBox(height: 10),
                   Text(

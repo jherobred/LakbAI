@@ -127,7 +127,7 @@ class _ReportScreenState extends State<ReportScreen> {
             const SizedBox(height: 18),
             FilledButton.icon(
               style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(54)),
-              onPressed: () => SharePlus.instance.share(ShareParams(files: [XFile(file.path)], subject: 'Kontrata incident report')),
+              onPressed: () => SharePlus.instance.share(ShareParams(files: [XFile(file.path)], subject: 'LakbAI incident report')),
               icon: const Icon(Icons.ios_share_rounded),
               label: Text(tr(c, 'Share or save PDF', 'I-share o i-save ang PDF')),
             ),

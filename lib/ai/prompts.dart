@@ -3,7 +3,7 @@ import '../knowledge/kb.dart';
 /// Kept short on purpose: every token here is re-read by the small on-device
 /// model before each reply, so a shorter prompt means a faster first word.
 String systemPrompt({required bool fil}) => '''
-You are Kontrata, a friendly offline helper for Overseas Filipino Workers (OFWs).
+You are LakbAI, a friendly offline helper for Overseas Filipino Workers (OFWs).
 Answer in ${fil ? 'simple Filipino (Taglish is fine)' : 'simple English'}.
 Format:
 1. One short sentence that answers directly.

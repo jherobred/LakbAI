@@ -165,7 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final q = _messages[_messages.length - 4];
     final a = _messages[_messages.length - 3];
     final ans = a.text.value;
-    return 'Worker: ${q.text.value}\nKontrata: ${ans.length > 240 ? '${ans.substring(0, 240)}…' : ans}';
+    return 'Worker: ${q.text.value}\nLakbAI: ${ans.length > 240 ? '${ans.substring(0, 240)}…' : ans}';
   }
 
   Future<void> _startVoice() async {
@@ -211,7 +211,7 @@ class _ChatScreenState extends State<ChatScreen> {
           const KLogo(size: 30),
           const SizedBox(width: 10),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Kontrata'),
+            const Text('LakbAI'),
             const AiStatusPill(),
           ]),
         ]),
@@ -843,7 +843,7 @@ class _Composer extends StatelessWidget {
               onSubmitted: (_) => onSend(),
               style: const TextStyle(fontSize: 16),
               decoration: InputDecoration(
-                hintText: tr(context, 'Ask Kontrata', 'Magtanong kay Kontrata'),
+                hintText: tr(context, 'Ask LakbAI', 'Magtanong kay LakbAI'),
                 filled: false,
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,

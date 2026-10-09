@@ -27,7 +27,7 @@ class ReportPdf {
   }
 
   static Future<File> build(CaseFile c, {required bool fil}) async {
-    final doc = pw.Document(title: 'Kontrata incident report ${c.id}', author: 'Kontrata (on-device)');
+    final doc = pw.Document(title: 'LakbAI incident report ${c.id}', author: 'LakbAI (on-device)');
     final kb = KnowledgeBase.instance;
     final lawIds = <String>{
       for (final d in c.discrepancies) ...d.kbIds,
@@ -80,9 +80,9 @@ class ReportPdf {
         margin: const pw.EdgeInsets.fromLTRB(40, 36, 40, 40),
         header: (ctx) => ctx.pageNumber == 1
             ? pw.SizedBox()
-            : pw.Text(s('Kontrata - ${c.id}'), style: const pw.TextStyle(fontSize: 8, color: _soft)),
+            : pw.Text(s('LakbAI - ${c.id}'), style: const pw.TextStyle(fontSize: 8, color: _soft)),
         footer: (ctx) => pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
-          pw.Text(s(fil ? 'Ginawa sa phone ng manggagawa gamit ang Kontrata. Hindi ito legal na payo.' : "Prepared on the worker's phone with Kontrata. Not legal advice."),
+          pw.Text(s(fil ? 'Ginawa sa phone ng manggagawa gamit ang LakbAI. Hindi ito legal na payo.' : "Prepared on the worker's phone with LakbAI. Not legal advice."),
               style: const pw.TextStyle(fontSize: 7.5, color: _soft)),
           pw.Text('${ctx.pageNumber}/${ctx.pagesCount}', style: const pw.TextStyle(fontSize: 8, color: _soft)),
         ]),
@@ -91,7 +91,7 @@ class ReportPdf {
             padding: const pw.EdgeInsets.all(16),
             decoration: pw.BoxDecoration(color: _blue, borderRadius: pw.BorderRadius.circular(10)),
             child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-              pw.Text('KONTRATA', style: pw.TextStyle(fontSize: 9, color: PdfColors.white, letterSpacing: 2, fontWeight: pw.FontWeight.bold)),
+              pw.Text('LAKBAI', style: pw.TextStyle(fontSize: 9, color: PdfColors.white, letterSpacing: 2, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 6),
               pw.Text(s(title), style: pw.TextStyle(fontSize: 17, color: PdfColors.white, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 6),
@@ -229,7 +229,7 @@ class ReportPdf {
     }
 
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/Kontrata-report-${c.id}.pdf');
+    final file = File('${dir.path}/LakbAI-report-${c.id}.pdf');
     await file.writeAsBytes(await doc.save(), flush: true);
     return file;
   }

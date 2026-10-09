@@ -8,8 +8,8 @@ import 'ui/chat.dart';
 import 'ui/lock.dart';
 import 'ui/onboarding.dart';
 
-class KontrataApp extends StatelessWidget {
-  const KontrataApp({super.key, required this.state});
+class LakbAIApp extends StatelessWidget {
+  const LakbAIApp({super.key, required this.state});
   final AppState state;
 
   @override
@@ -19,7 +19,7 @@ class KontrataApp extends StatelessWidget {
       child: Builder(builder: (context) {
         final s = AppScope.of(context);
         return MaterialApp(
-          title: 'Kontrata',
+          title: 'LakbAI',
           debugShowCheckedModeBanner: false,
           theme: KTheme.light(),
           darkTheme: KTheme.dark(),

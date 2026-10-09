@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Kontrata uses the camera to scan your contract. Photos stay on this phone.</string>
+	<string>LakbAI uses the camera to scan your contract. Photos stay on this phone.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Kontrata turns your voice into text on this phone. Audio is never uploaded.</string>
+	<string>LakbAI turns your voice into text on this phone. Audio is never uploaded.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Pick a photo of your contract. It stays on this phone.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Kontrata</string>
+	<string>LakbAI</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,7 +21,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>kontrata</string>
+	<string>LakbAI</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

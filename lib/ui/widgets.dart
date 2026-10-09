@@ -28,7 +28,7 @@ Future<void> callNumber(BuildContext context, String number) async {
   }
 }
 
-/// The Kontrata mark: a shield holding a contract with a check.
+/// The LakbAI mark: a shield holding a contract with a check.
 class KLogo extends StatefulWidget {
   const KLogo({super.key, this.size = 56, this.animate = false});
   final double size;

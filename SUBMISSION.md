@@ -1,11 +1,11 @@
 # Submission notes (Cerebral Valley form)
 
-**Project name:** Kontrata
+**Project name:** LakbAI
 
 **Short description:** An offline contract checker for Overseas Filipino Workers. It compares the DMW-verified contract with the one handed over abroad, explains every change, and builds a formal incident report. All AI runs on the phone.
 
 **Why does this product benefit from running AI locally?**
-Contract substitution happens at an agency desk or on arrival abroad. There the worker may have no SIM, no data or Wi-Fi, and an employer who checks their phone. Kontrata's language model, speech recognition and text recognition run on the device in airplane mode. The contracts, which carry passport numbers and salaries, never leave the phone, and there is no cloud account or chat log to find. On-device inference also makes every scan and question free for low-income workers.
+Contract substitution happens at an agency desk or on arrival abroad. There the worker may have no SIM, no data or Wi-Fi, and an employer who checks their phone. LakbAI's language model, speech recognition and text recognition run on the device in airplane mode. The contracts, which carry passport numbers and salaries, never leave the phone, and there is no cloud account or chat log to find. On-device inference also makes every scan and question free for low-income workers.
 
 **What runs locally:** the language model (Qwen3 0.6B or Gemma 4 E2B, LiteRT-LM), speech-to-text (Whisper), contract text recognition (ML Kit), clause comparison, legal knowledge search, and PDF report generation.
 
@@ -23,10 +23,10 @@ Contract substitution happens at an agency desk or on arrival abroad. There the 
 
 ## 1-minute demo video plan
 
-1. **0–8 s:** "OFWs get their contract swapped abroad. Kontrata catches it, offline." Switch on airplane mode on screen.
+1. **0–8 s:** "OFWs get their contract swapped abroad. LakbAI catches it, offline." Switch on airplane mode on screen.
 2. **8–25 s:** Compare contracts. Scan both papers (or use the samples) and the "6 changes against you" screen counts up. Scroll the red cards.
 3. **25–38 s:** Type "kinuha ang passport ko". The *passport* chip appears, the chat filters, and the local AI answers with the law cited.
 4. **38–50 s:** Open My options and pick step 1, then Make report, Speak it, and Create PDF.
-5. **50–60 s:** "No cloud, no account, no trace. Kontrata." Show the airplane mode icon again.
+5. **50–60 s:** "No cloud, no account, no trace. LakbAI." Show the airplane mode icon again.
 
 Post it on X or LinkedIn tagging Devin / Cognition with **#AppBuildersPH**.

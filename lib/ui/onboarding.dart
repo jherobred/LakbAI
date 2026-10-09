@@ -45,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Row(children: [
                 const KLogo(size: 30),
                 const SizedBox(width: 8),
-                Text('Kontrata', style: Theme.of(context).textTheme.titleMedium),
+                Text('LakbAI', style: Theme.of(context).textTheme.titleMedium),
                 const Spacer(),
                 const _LangToggle(),
               ]),
@@ -97,7 +97,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       context: context,
       builder: (c) => AlertDialog(
         icon: const Icon(Icons.lock_rounded),
-        title: Text(tr(c, 'Lock Kontrata with a PIN?', 'I-lock ang Kontrata gamit ang PIN?')),
+        title: Text(tr(c, 'Lock LakbAI with a PIN?', 'I-lock ang LakbAI gamit ang PIN?')),
         content: Text(tr(c, 'Recommended if someone else may check your phone. You can change this later in Settings.',
             'Mainam kung may ibang tumitingin sa phone mo. Puwede mo itong baguhin sa Settings.')),
         actions: [
@@ -212,8 +212,8 @@ class _Welcome extends StatelessWidget {
       visual: const KLogo(size: 150, animate: true),
       title: tr(context, 'Know if your contract was changed.', 'Alamin kung binago ang kontrata mo.'),
       body: tr(context,
-          'Kontrata compares the contract DMW verified with the one you are asked to sign abroad, explains every change, and helps you decide what to do. Safely, at your own pace.',
-          'Ikinukumpara ng Kontrata ang kontratang na-verify ng DMW sa kontratang pinapapirma sa iyo sa abroad, ipinapaliwanag ang bawat pagbabago, at tinutulungan kang magpasya. Ligtas, at sa sarili mong bilis.'),
+          'LakbAI compares the contract DMW verified with the one you are asked to sign abroad, explains every change, and helps you decide what to do. Safely, at your own pace.',
+          'Ikinukumpara ng LakbAI ang kontratang na-verify ng DMW sa kontratang pinapapirma sa iyo sa abroad, ipinapaliwanag ang bawat pagbabago, at tinutulungan kang magpasya. Ligtas, at sa sarili mong bilis.'),
     );
   }
 }
@@ -333,8 +333,8 @@ class _Country extends StatelessWidget {
     return _Page(
       visual: Icon(Icons.travel_explore_rounded, size: 110, color: cs.primary),
       title: tr(context, 'Where are you working?', 'Saan ka nagtatrabaho?'),
-      body: tr(context, 'This helps Kontrata check local minimums. You can skip it.',
-          'Para ma-check ng Kontrata ang minimum doon. Puwedeng laktawan.'),
+      body: tr(context, 'This helps LakbAI check local minimums. You can skip it.',
+          'Para ma-check ng LakbAI ang minimum doon. Puwedeng laktawan.'),
       extra: Wrap(spacing: 10, runSpacing: 10, children: [
         for (final e in options.entries)
           ChoiceChip(
