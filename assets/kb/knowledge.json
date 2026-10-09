@@ -11,7 +11,8 @@
       "title_fil": "Bawal ang pagpapalit ng kontrata",
       "body_en": "Replacing or changing a DMW-verified employment contract in a way that hurts the worker, without DMW approval, is a prohibited practice under Article 34(i) of the Labor Code. Republic Act 8042, as amended by RA 10022, lists it in Section 6 as a form of illegal recruitment. It applies from the day the contract is signed until it expires.",
       "body_fil": "Bawal palitan o baguhin ang kontratang na-verify ng DMW kung ikalulugi ito ng manggagawa at walang pahintulot ng DMW. Ito ay ipinagbabawal ng Labor Code (Art. 34(i)) at itinuturing na illegal recruitment sa ilalim ng RA 8042 Sec. 6, na inamyendahan ng RA 10022.",
-      "source": {"label": "Labor Code Art. 34(i); RA 8042 Sec. 6 as amended", "url": "https://batasnatin.com/doctrine/labor-illegal-recruitment-by-any-person-IF2-PIHO-AFA-TUNA"}
+      "source": {"label": "Labor Code Art. 34(i); RA 8042 Sec. 6 as amended", "url": "https://batasnatin.com/doctrine/labor-illegal-recruitment-by-any-person-IF2-PIHO-AFA-TUNA"},
+      "keywords": ["pinalitan ang kontrata", "binago ang kontrata", "ibang kontrata", "bagong kontrata", "new contract", "different contract", "swapped", "replaced", "lower salary", "mas mababa", "pagdating", "arrived", "pinapalitan"]
     },
     {
       "id": "substitution_mc_2009",
@@ -21,7 +22,8 @@
       "title_fil": "Puwedeng matanggalan ng lisensya ang ahensya",
       "body_en": "POEA Memorandum Circular No. 04, Series of 2009, bars recruiters and their foreign employers from altering DOLE/DMW-verified contracts to the worker's detriment from signing until expiry unless the government approves. Penalties escalate from license suspension to cancellation for repeat offenses.",
       "body_fil": "Ayon sa POEA MC No. 04 (2009), hindi puwedeng baguhin ng ahensya o employer ang na-verify na kontrata kung ikalulugi ito ng manggagawa. Ang parusa ay suspensyon hanggang tuluyang pagkansela ng lisensya.",
-      "source": {"label": "POEA MC No. 04, s. 2009", "url": "https://dev.lawyerly.ph/laws/47331"}
+      "source": {"label": "POEA MC No. 04, s. 2009", "url": "https://dev.lawyerly.ph/laws/47331"},
+      "keywords": ["license", "lisensya", "parusa", "penalty", "cancel", "suspend"]
     },
     {
       "id": "agency_joint_liability",
@@ -31,7 +33,8 @@
       "title_fil": "Mananagot din ang ahensya sa Pilipinas, kahit binago ang kontrata sa abroad",
       "body_en": "Under Section 10 of RA 8042, as amended by RA 10022, the Philippine recruitment agency and the foreign employer are jointly and severally liable for the worker's money claims, including damages. This liability lasts for the whole contract and is not affected by any substitution or change made in the Philippines or abroad. Officers of the agency can be personally liable, and awards can be paid from the agency's bond. You can file after you come home, against the agency in the Philippines.",
       "body_fil": "Sa ilalim ng RA 8042 Sec. 10 (inamyendahan ng RA 10022), sabay na mananagot ang ahensya sa Pilipinas at ang employer sa abroad sa sahod at danyos na hinahabol mo. Hindi ito nawawala kahit pinalitan ang kontrata. Puwede kang magsampa pag-uwi mo, laban sa ahensya dito sa Pilipinas.",
-      "source": {"label": "RA 8042 Sec. 10 as amended by RA 10022", "url": "https://batasnatin.com/laws/labor-solidary-liability-local-agency-foreign-employer"}
+      "source": {"label": "RA 8042 Sec. 10 as amended by RA 10022", "url": "https://batasnatin.com/laws/labor-solidary-liability-local-agency-foreign-employer"},
+      "keywords": ["ahensya sa pilipinas", "agency sa manila", "mananagot", "liable", "singilin", "habulin", "go after", "sue the agency", "idemanda ang ahensya"]
     },
     {
       "id": "deadlines",
@@ -41,7 +44,8 @@
       "title_fil": "Taning: 3 taon para sa paghabol ng pera",
       "body_en": "Money claims from employment, such as unpaid or underpaid salary, must be filed within 3 years from when they arose (Labor Code Art. 306, formerly Art. 291). Illegal recruitment cases must be filed within 5 years, or 20 years if the crime counts as economic sabotage, meaning a syndicate or large-scale recruitment (RA 8042 Sec. 12). Keep your evidence so you can still file later.",
       "body_fil": "Ang paghabol sa kulang o hindi binayarang sahod ay dapat isampa sa loob ng 3 taon (Labor Code Art. 306). Ang kaso ng illegal recruitment ay 5 taon, o 20 taon kung sindikato o large-scale (RA 8042 Sec. 12). Itago ang ebidensya para makapagsampa ka pa rin kahit sa ibang araw.",
-      "source": {"label": "Labor Code Art. 306; RA 8042 Sec. 12", "url": "https://batasnatin.com/laws/labor-prescription-money-claims-3-years"}
+      "source": {"label": "Labor Code Art. 306; RA 8042 Sec. 12", "url": "https://batasnatin.com/laws/labor-prescription-money-claims-3-years"},
+      "keywords": ["hanggang kailan", "ilang taon", "huli na", "too late", "late", "taning", "deadline", "prescription", "magreklamo", "file a case", "expire"]
     },
     {
       "id": "evidence_rules",
@@ -51,7 +55,8 @@
       "title_fil": "Magagamit na ebidensya ang mga litrato at tala mo",
       "body_en": "Labor arbiters are not bound by the strict rules of evidence used in regular courts (Labor Code Art. 227, formerly Art. 221). They decide on substantial evidence. Photos of both contracts, payslips, messages, and your own written account of dates, names and what was said all help. To file, you still sign a sworn statement, and you should keep the original papers safe.",
       "body_fil": "Hindi mahigpit ang labor arbiter sa teknikal na patakaran ng ebidensya (Labor Code Art. 227). Makakatulong ang litrato ng dalawang kontrata, payslip, mga mensahe, at sarili mong tala ng petsa, pangalan at sinabi nila. Kakailanganin pa rin ang pinirmahang sinumpaang salaysay, at itago ang orihinal na papeles.",
-      "source": {"label": "Labor Code Art. 227", "url": "https://www.respicio.ph/commentaries/what-to-do-if-your-overseas-employment-contract-is-replaced-after-arrival"}
+      "source": {"label": "Labor Code Art. 227", "url": "https://www.respicio.ph/commentaries/what-to-do-if-your-overseas-employment-contract-is-replaced-after-arrival"},
+      "keywords": ["ebidensya", "litrato", "picture", "photo", "screenshot", "recording", "patunay", "proof", "pruweba"]
     },
     {
       "id": "first_steps_substitution",
@@ -61,7 +66,8 @@
       "title_fil": "Kung pinalitan ang kontrata mo: unang hakbang",
       "body_en": "Keep copies of both contracts. Write down every difference and any pressure used, with the date, place and people present. Tell your agency in writing if it is safe to do so. Avoid walking off the job, handing over original papers, or signing a settlement you do not fully understand. You can ask for time and a copy before you sign anything.",
       "body_fil": "Itago ang kopya ng dalawang kontrata. Isulat ang bawat pagbabago at kung pinilit ka, pati petsa, lugar at sino ang naroon. Sabihan ang ahensya nang nakasulat kung ligtas. Huwag basta umalis sa trabaho, ibigay ang orihinal na papeles, o pumirma ng areglo na hindi mo naiintindihan. Puwede kang humingi ng oras at kopya bago pumirma.",
-      "source": {"label": "Respicio & Co. guidance", "url": "https://www.respicio.ph/commentaries/what-to-do-if-your-overseas-employment-contract-is-replaced-after-arrival"}
+      "source": {"label": "Respicio & Co. guidance", "url": "https://www.respicio.ph/commentaries/what-to-do-if-your-overseas-employment-contract-is-replaced-after-arrival"},
+      "keywords": ["anong gagawin", "ano ang gagawin", "what do i do", "unang hakbang", "first steps", "pinalitan", "binago"]
     },
     {
       "id": "renegotiated_terms",
@@ -71,7 +77,8 @@
       "title_fil": "Kailangang ma-verify ang bagong kontrata sa abroad",
       "body_en": "Changes to an overseas contract are supposed to go through the Migrant Workers Office (MWO) at the Philippine embassy or consulate for verification. A change that makes your terms worse without DMW approval is substitution. You can ask the MWO to check a new contract before or after you sign it.",
       "body_fil": "Ang anumang pagbabago sa kontrata ay dapat dumaan sa Migrant Workers Office (MWO) sa embahada o konsulado para ma-verify. Kapag lumala ang kondisyon mo nang walang pahintulot ng DMW, contract substitution iyon. Puwede mong ipa-check sa MWO ang bagong kontrata.",
-      "source": {"label": "DMW / MWO contract verification", "url": "https://www.respicio.ph/commentaries/ofw-rights-on-contract-substitution-and-illegal-termination-how-to-seek-owwa-and-dmw-assistance"}
+      "source": {"label": "DMW / MWO contract verification", "url": "https://www.respicio.ph/commentaries/ofw-rights-on-contract-substitution-and-illegal-termination-how-to-seek-owwa-and-dmw-assistance"},
+      "keywords": ["re-sign", "pinapirma ulit", "renegotiate", "verify", "verified", "mwo verification", "bagong kontrata abroad"]
     },
     {
       "id": "where_abroad",
@@ -81,7 +88,8 @@
       "title_fil": "Saan hihingi ng tulong habang nasa abroad",
       "body_en": "Go to the Migrant Workers Office (MWO, formerly POLO) at the Philippine embassy or consulate. It can investigate, help you write a complaint-affidavit, and connect you with OWWA welfare officers. If you are in danger, ask for shelter and help with repatriation.",
       "body_fil": "Pumunta sa Migrant Workers Office (MWO, dating POLO) sa embahada o konsulado ng Pilipinas. Matutulungan ka nilang mag-imbestiga, gumawa ng complaint-affidavit, at makausap ang OWWA welfare officer. Kung nasa panganib ka, humingi ng shelter at tulong para makauwi.",
-      "source": {"label": "DMW / MWO assistance", "url": "https://www.lawyer-philippines.com/articles/how-to-file-labor-complaint-for-ofw-abroad-philippines"}
+      "source": {"label": "DMW / MWO assistance", "url": "https://www.lawyer-philippines.com/articles/how-to-file-labor-complaint-for-ofw-abroad-philippines"},
+      "keywords": ["embahada", "embassy", "konsulado", "consulate", "mwo", "polo", "migrant workers office", "saan hihingi ng tulong", "tulong dito", "help here"]
     },
     {
       "id": "where_home",
@@ -91,7 +99,8 @@
       "title_fil": "Saan magsasampa sa Pilipinas",
       "body_en": "For the substitution itself, file an administrative case with the DMW Adjudication Office. Under the 2023 rules you may file at the DMW regional office where you were recruited or where you live. For money claims such as salary differences, the case goes to a Labor Arbiter of the National Labor Relations Commission (NLRC), against the agency and the employer.",
       "body_fil": "Para sa mismong pagpapalit ng kontrata, magsampa ng administratibong kaso sa DMW Adjudication Office, sa regional office kung saan ka na-recruit o kung saan ka nakatira. Para sa kulang na sahod, sa Labor Arbiter ng NLRC, laban sa ahensya at employer.",
-      "source": {"label": "DMW 2023 Rules; RA 8042 Sec. 10", "url": "https://www.respicio.ph/commentaries/ofw-rights-on-contract-substitution-and-illegal-termination-how-to-seek-owwa-and-dmw-assistance"}
+      "source": {"label": "DMW 2023 Rules; RA 8042 Sec. 10", "url": "https://www.respicio.ph/commentaries/ofw-rights-on-contract-substitution-and-illegal-termination-how-to-seek-owwa-and-dmw-assistance"},
+      "keywords": ["pag-uwi", "pagbalik sa pilipinas", "pilipinas", "philippines", "dmw office", "nlrc", "magsampa", "magreklamo", "magrereklamo", "reklamo", "file at home"]
     },
     {
       "id": "sena",
@@ -101,7 +110,8 @@
       "title_fil": "SEnA: 30 araw na pag-uusap bago ang kaso",
       "body_en": "Most labor disputes first go through the Single Entry Approach (SEnA), a 30-day conciliation-mediation under DOLE Department Order 107-10. SEnA desks are at the NLRC and the DMW. Many money claims settle here without a full case.",
       "body_fil": "Karamihan ng reklamo sa trabaho ay dumadaan muna sa SEnA, isang 30 araw na mediation (DOLE DO 107-10). May SEnA desk sa NLRC at DMW. Maraming kaso ng sahod ang naaayos dito nang hindi na umaabot sa buong kaso.",
-      "source": {"label": "DOLE Dept. Order 107-10 (SEnA)", "url": "https://www.respicio.ph/commentaries/what-to-do-if-your-overseas-employment-contract-is-replaced-after-arrival"}
+      "source": {"label": "DOLE Dept. Order 107-10 (SEnA)", "url": "https://www.respicio.ph/commentaries/what-to-do-if-your-overseas-employment-contract-is-replaced-after-arrival"},
+      "keywords": ["sena", "mediation", "conciliation", "areglo", "ayusan", "settlement", "usapan"]
     },
     {
       "id": "criminal_case",
@@ -111,7 +121,8 @@
       "title_fil": "Krimen ang illegal recruitment",
       "body_en": "Illegal recruitment complaints can be filed through the DMW, the NBI, the PNP, or the prosecutor's office, usually with sworn statements. Under RA 10022 the penalty is 12 years and 1 day to 20 years in prison and a fine of 1 to 2 million pesos, or life imprisonment and a fine of 2 to 5 million pesos when it counts as economic sabotage.",
       "body_fil": "Puwedeng magsampa ng reklamo ng illegal recruitment sa DMW, NBI, PNP, o piskal, kadalasan gamit ang sinumpaang salaysay. Ayon sa RA 10022, ang parusa ay 12 hanggang 20 taong pagkakakulong at multang ₱1–2 milyon, o habambuhay at ₱2–5 milyon kung economic sabotage.",
-      "source": {"label": "RA 8042 Sec. 7 as amended by RA 10022", "url": "https://ndvlaw.com/illegal-recruitment-and-its-penalty/"}
+      "source": {"label": "RA 8042 Sec. 7 as amended by RA 10022", "url": "https://ndvlaw.com/illegal-recruitment-and-its-penalty/"},
+      "keywords": ["kulong", "makulong", "demanda", "kasong kriminal", "criminal", "estafa", "illegal recruitment", "kakasuhan"]
     },
     {
       "id": "hotline_1348",
@@ -121,7 +132,8 @@
       "title_fil": "DMW/OWWA hotline 1348 (24/7)",
       "body_en": "Call 1348 for urgent help, contract problems, and repatriation requests. It runs 24 hours a day. From abroad, dial +63 2 1348. You can ask questions without filing a case.",
       "body_fil": "Tumawag sa 1348 para sa agarang tulong, problema sa kontrata, at pagpapauwi. Bukas ito 24 oras. Mula abroad, i-dial ang +63 2 1348. Puwede kang magtanong nang hindi nagsasampa ng kaso.",
-      "source": {"label": "DMW/OWWA Hotline 1348", "url": "https://newsinfo.inquirer.net/?p=1102231"}
+      "source": {"label": "DMW/OWWA Hotline 1348", "url": "https://newsinfo.inquirer.net/?p=1102231"},
+      "keywords": ["hotline", "numero", "number", "tawagan", "call", "tatawagan", "emergency", "owwa hotline", "dmw hotline"]
     },
     {
       "id": "hotline_1343",
@@ -131,7 +143,8 @@
       "title_fil": "1343 Actionline laban sa trafficking at illegal recruitment",
       "body_en": "The Inter-Agency Council Against Trafficking runs the 1343 Actionline, 24/7. Dial 1343 in Metro Manila, (02) 1343 elsewhere in the Philippines, or +63 2 1343 from abroad. You can also email 1343actionline@cfo.gov.ph or report at 1343actionline.ph.",
       "body_fil": "Ang 1343 Actionline ng IACAT ay bukas 24/7. I-dial ang 1343 sa Metro Manila, (02) 1343 sa ibang lugar sa Pilipinas, o +63 2 1343 mula abroad. Puwede ring mag-email sa 1343actionline@cfo.gov.ph.",
-      "source": {"label": "1343 Actionline (IACAT/CFO)", "url": "https://1343actionline.ph/"}
+      "source": {"label": "1343 Actionline (IACAT/CFO)", "url": "https://1343actionline.ph/"},
+      "keywords": ["1343", "iacat", "cfo", "trafficking hotline", "emergency", "nakakulong", "kinulong"]
     },
     {
       "id": "hsw_rest",
@@ -141,7 +154,8 @@
       "title_fil": "Kasambahay: 8 oras na pahinga araw-araw, 1 day off kada linggo",
       "body_en": "The DMW standard employment contract for household service workers guarantees at least 8 continuous hours of rest every day and at least one rest day every week. A contract that removes or shrinks these is below the standard.",
       "body_fil": "Ayon sa standard contract ng DMW para sa household service workers, may karapatan ka sa hindi bababa sa 8 tuloy-tuloy na oras ng pahinga araw-araw at hindi bababa sa isang day off kada linggo.",
-      "source": {"label": "DMW Standard Employment Contract (HSW)", "url": "https://www.respicio.ph/commentaries/vacation-pay-entitlement-for-household-service-worker-abroad-philippines"}
+      "source": {"label": "DMW Standard Employment Contract (HSW)", "url": "https://www.respicio.ph/commentaries/vacation-pay-entitlement-for-household-service-worker-abroad-philippines"},
+      "keywords": ["walang day off", "day off", "pahinga", "tulog", "walang tulog", "puyat", "oras ng tulog", "rest hours", "rest day", "kasambahay", "katulong", "helper", "maid"]
     },
     {
       "id": "hsw_leave",
@@ -151,7 +165,8 @@
       "title_fil": "Kasambahay: hindi bababa sa 15 araw na bayad na bakasyon kada taon",
       "body_en": "The standard household service worker contract gives at least 15 calendar days of vacation leave with full pay for each year of service. Some templates express this as one month of paid vacation for every two years.",
       "body_fil": "Sa standard contract ng household service worker, may hindi bababa sa 15 araw na bakasyon na may buong bayad kada taon ng serbisyo.",
-      "source": {"label": "DMW Standard Employment Contract (HSW)", "url": "https://www.respicio.ph/commentaries/vacation-pay-entitlement-for-household-service-worker-abroad-philippines"}
+      "source": {"label": "DMW Standard Employment Contract (HSW)", "url": "https://www.respicio.ph/commentaries/vacation-pay-entitlement-for-household-service-worker-abroad-philippines"},
+      "keywords": ["bakasyon", "leave", "vacation", "annual leave", "ilang araw", "uwi sa bakasyon", "kasambahay"]
     },
     {
       "id": "hsw_minimum_wage",
@@ -161,7 +176,8 @@
       "title_fil": "Kasambahay: US$500 kada buwan ang minimum ng DMW",
       "body_en": "DMW Advisory No. 25-2025 raised the minimum monthly salary for Filipino domestic workers abroad from US$400 to US$500, applied to new hires, renewals and returning workers. DMW Memorandum Circular 03-2025 phased it in with a voluntary transition period, and some host countries pushed back, so check the current status with the MWO. When the host country's own minimum is higher, the higher one applies.",
       "body_fil": "Itinaas ng DMW (Advisory No. 25-2025) ang minimum na sahod ng Pilipinong kasambahay sa abroad mula US$400 tungong US$500 kada buwan. May transition period ito (MC 03-2025), kaya kumpirmahin sa MWO. Kapag mas mataas ang minimum ng bansang pinagtatrabahuhan, iyon ang susundin.",
-      "source": {"label": "DMW Advisory 25-2025; MC 03-2025", "url": "https://www.sunstar.com.ph/manila/dmw-ups-minimum-wage-rate-for-pinoy-domestic-workers"}
+      "source": {"label": "DMW Advisory 25-2025; MC 03-2025", "url": "https://www.sunstar.com.ph/manila/dmw-ups-minimum-wage-rate-for-pinoy-domestic-workers"},
+      "keywords": ["minimum na sahod", "minimum wage", "minimum salary", "500 dollars", "kasambahay", "katulong", "helper", "helpers", "maid", "dh", "hsw", "magkano"]
     },
     {
       "id": "hsw_free_board",
@@ -171,7 +187,8 @@
       "title_fil": "Kasambahay: libreng pagkain, tirahan at pamasahe",
       "body_en": "Standard household service worker contracts provide free suitable living quarters, free food (or a food allowance where host law allows it), and free transportation to the worksite and back home at the end of the contract. Check your verified contract for the exact clauses, and treat any removal as a change to report.",
       "body_fil": "Sa standard contract ng kasambahay, libre ang maayos na tirahan, pagkain (o food allowance kung pinapayagan ng batas doon), at pamasahe papunta at pauwi sa pagtatapos ng kontrata. Tingnan ang na-verify mong kontrata at ituring na pagbabago ang anumang tinanggal.",
-      "source": {"label": "DMW Standard Employment Contract (HSW)", "url": "https://aganapcg.dfa.gov.ph/images/Consular%20Forms/POLO/Standard%20Contract%20-%20Household.docx"}
+      "source": {"label": "DMW Standard Employment Contract (HSW)", "url": "https://aganapcg.dfa.gov.ph/images/Consular%20Forms/POLO/Standard%20Contract%20-%20Household.docx"},
+      "keywords": ["libreng pagkain", "libreng tirahan", "hindi pinapakain", "pinapakain", "feed", "hungry", "gutom", "kwarto", "ticket", "pamasahe", "airfare"]
     },
     {
       "id": "fees_hsw",
@@ -181,7 +198,8 @@
       "title_fil": "Placement fee: wala dapat para sa kasambahay",
       "body_en": "Under DMW rules, agencies may not charge placement fees to household service workers. For other workers the fee is generally capped at one month's basic salary, and none may be charged where the host country prohibits it. Always ask for an official receipt. Charging more than the law allows is illegal recruitment.",
       "body_fil": "Ayon sa patakaran ng DMW, bawal singilin ng placement fee ang household service workers. Sa ibang manggagawa, karaniwang hanggang isang buwang sahod lang, at wala kung bawal ito sa bansang pupuntahan. Laging humingi ng opisyal na resibo. Illegal recruitment ang paniningil nang lampas sa batas.",
-      "source": {"label": "DMW/POEA rules on placement fees", "url": "https://www.respicio.ph/commentaries/illegal-recruitment-reporting-and-remedies-in-the-philippines"}
+      "source": {"label": "DMW/POEA rules on placement fees", "url": "https://www.respicio.ph/commentaries/illegal-recruitment-reporting-and-remedies-in-the-philippines"},
+      "keywords": ["placement fee", "bayad sa ahensya", "sinisingil", "pinagbabayad", "magbayad", "walang placement fee", "kasambahay", "household worker"]
     },
     {
       "id": "withholding_documents",
@@ -191,7 +209,19 @@
       "title_fil": "Illegal ang pagkuha ng passport kapalit ng bayad",
       "body_en": "RA 8042 Section 6 lists withholding or denying travel documents from workers before departure for monetary or financial considerations as a form of illegal recruitment. If someone keeps your passport until you pay, document it and report it.",
       "body_fil": "Ayon sa RA 8042 Sec. 6, illegal recruitment ang pagkuha o hindi pagbigay ng passport o travel documents bago umalis kapalit ng pera. Kung hawak nila ang passport mo hangga't hindi ka nagbabayad, itala ito at i-report.",
-      "source": {"label": "RA 8042 Sec. 6 as amended", "url": "https://batasnatin.com/doctrine/labor-illegal-recruitment-by-any-person-IF2-PIHO-AFA-TUNA"}
+      "source": {"label": "RA 8042 Sec. 6 as amended", "url": "https://batasnatin.com/doctrine/labor-illegal-recruitment-by-any-person-IF2-PIHO-AFA-TUNA"},
+      "keywords": ["kinuha ang passport", "tinago", "tinatago", "hawak ng amo", "pasaporte", "iqama", "kinumpiska", "confiscated", "took my passport", "keeps my passport", "kinuha"]
+    },
+    {
+      "id": "passport_abroad",
+      "kind": "law",
+      "topics": ["passport", "help", "complaint"],
+      "title_en": "If your employer abroad took your passport",
+      "title_fil": "Kung kinuha ng amo sa abroad ang passport mo",
+      "body_en": "Your passport is the property of the Philippine government, not your employer. Many host countries also bar employers from keeping it, including the UAE and Kuwait (without your consent). Write down when it was taken and who has it, photograph your visa or ID if you can, and ask the Migrant Workers Office to help get it back.",
+      "body_fil": "Pag-aari ng gobyerno ng Pilipinas ang passport mo, hindi ng amo mo. Bawal din itong hawakan ng amo sa maraming bansa, kasama ang UAE at Kuwait (nang walang pahintulot mo). Isulat kung kailan ito kinuha at sino ang may hawak, kunan ng litrato ang visa o ID kung kaya, at humingi ng tulong sa Migrant Workers Office para maibalik ito.",
+      "source": {"label": "RA 8239 (Philippine Passport Act); UAE Decree-Law No. 9 of 2022; Kuwait Law No. 68 of 2015", "url": "https://lawphil.net/statutes/repacts/ra1996/ra_8239_1996.html"},
+      "keywords": ["kinuha ang passport", "kinuha", "kinuha ng amo", "hawak ng amo", "tinago", "tinatago", "kinumpiska", "took my passport", "keeps my passport", "has my passport", "pasaporte", "passport ko", "ibalik", "get it back"]
     },
     {
       "id": "recruiter_red_flags",
@@ -201,7 +231,8 @@
       "title_fil": "Mga senyales ng illegal recruiter",
       "body_en": "Warning signs: no DMW license, or an office that is not the licensed address. Fees before a job order, or without official receipts. Being told to leave as a tourist or to lie at immigration. Your passport held until you pay. Deals done only through Facebook, WhatsApp or text. A job that differs from your visa or contract. Departure without DMW processing or an OFW Pass.",
       "body_fil": "Babala: walang lisensya mula DMW o hindi sa lisensyadong opisina. Naniningil bago may job order o walang resibo. Pinapaalis ka bilang turista o pinagsisinungaling sa immigration. Hawak ang passport mo hangga't hindi ka nagbabayad. Sa Facebook, WhatsApp o text lang kayo nag-uusap. Iba ang trabaho sa visa o kontrata. Pinapaalis ka nang walang proseso ng DMW o OFW Pass.",
-      "source": {"label": "DMW / Respicio & Co.", "url": "https://www.respicio.ph/commentaries/illegal-recruitment-reporting-and-remedies-in-the-philippines"}
+      "source": {"label": "DMW / Respicio & Co.", "url": "https://www.respicio.ph/commentaries/illegal-recruitment-reporting-and-remedies-in-the-philippines"},
+      "keywords": ["scam", "budol", "fixer", "tourist visa", "tourist", "legit", "peke", "fake", "recruiter", "red flags"]
     },
     {
       "id": "verify_license",
@@ -211,7 +242,8 @@
       "title_fil": "I-check ang lisensya ng ahensya",
       "body_en": "Licensed agencies are listed on the DMW website (dmw.gov.ph). Check the exact name and license status when you have internet, and keep a screenshot. LakbAI cannot verify licenses offline.",
       "body_fil": "Nakalista sa website ng DMW (dmw.gov.ph) ang mga lisensyadong ahensya. I-check ang eksaktong pangalan at status kapag may internet, at mag-screenshot. Hindi ito kayang i-verify ng LakbAI nang offline.",
-      "source": {"label": "DMW licensed agencies list", "url": "https://dmw.gov.ph"}
+      "source": {"label": "DMW licensed agencies list", "url": "https://dmw.gov.ph"},
+      "keywords": ["legit", "lisensyado", "licensed", "check agency", "dmw list", "totoo ba", "malalaman", "paano malalaman"]
     },
     {
       "id": "trafficking",
@@ -221,7 +253,8 @@
       "title_fil": "Protektado ang biktima ng trafficking",
       "body_en": "Recruiting someone by deception or force for forced labor is trafficking under RA 9208, as amended by RA 10364 and RA 11862. Victims are not penalized for acts done as a direct result of being trafficked, and can get shelter, legal help and witness protection. Call the 1343 Actionline.",
       "body_fil": "Trafficking ang pag-recruit gamit ang panloloko o pamimilit para sa sapilitang trabaho (RA 9208, inamyendahan ng RA 10364 at RA 11862). Hindi pinaparusahan ang biktima sa mga nagawa dahil sa trafficking, at may shelter, legal na tulong at proteksyon. Tumawag sa 1343.",
-      "source": {"label": "RA 9208 as amended", "url": "https://1343actionline.ph/"}
+      "source": {"label": "RA 9208 as amended", "url": "https://1343actionline.ph/"},
+      "keywords": ["ibinenta", "binenta", "sapilitan", "forced", "escort", "tourist visa", "backdoor", "nakakulong", "kinulong"]
     },
     {
       "id": "repatriation",
@@ -231,7 +264,8 @@
       "title_fil": "Pag-uwi: ahensya ang magbabayad",
       "body_en": "Under RA 8042 Section 15, bringing the worker home and transporting their belongings is primarily the responsibility of the agency that deployed them, with costs borne by the agency or its foreign principal. The exception is when termination was the worker's own fault. Ask the MWO or call 1348 for repatriation help.",
       "body_fil": "Ayon sa RA 8042 Sec. 15, pangunahing responsibilidad ng ahensya ang pagpapauwi sa manggagawa at sa gamit nito, at ang ahensya o employer ang gagastos, maliban kung kasalanan ng manggagawa ang pagkatanggal. Humingi ng tulong sa MWO o tumawag sa 1348.",
-      "source": {"label": "RA 8042 Sec. 15", "url": "https://lawyerly.ph/laws/view/led7"}
+      "source": {"label": "RA 8042 Sec. 15", "url": "https://lawyerly.ph/laws/view/led7"},
+      "keywords": ["pag-uwi", "uwi", "makauwi", "pauwi", "ticket", "pamasahe", "flight", "gusto ko nang umuwi", "go home", "ticket home"]
     },
     {
       "id": "illegal_dismissal_pay",
@@ -241,7 +275,8 @@
       "title_fil": "Kung tinanggal ka nang walang sapat na dahilan",
       "body_en": "An OFW dismissed without just or valid cause can claim the salaries for the unexpired portion of the contract and a refund of the placement fee with interest, under RA 8042 Section 10. The Supreme Court struck down the old three-month cap on this pay. Claims go to the NLRC.",
       "body_fil": "Ang OFW na tinanggal nang walang sapat na dahilan ay puwedeng humabol ng sahod para sa natitirang panahon ng kontrata at refund ng placement fee na may interes (RA 8042 Sec. 10). Sa NLRC isinasampa ito.",
-      "source": {"label": "RA 8042 Sec. 10", "url": "https://batasnatin.com/laws/migrant-workers-act-ra-8042-as-amended"}
+      "source": {"label": "RA 8042 Sec. 10", "url": "https://batasnatin.com/laws/migrant-workers-act-ra-8042-as-amended"},
+      "keywords": ["tinanggal", "sinisante", "sinesante", "pinaalis", "fired", "terminated", "dismissed", "walang dahilan", "without reason", "valid reason"]
     },
     {
       "id": "aksyon_fund",
@@ -251,7 +286,8 @@
       "title_fil": "Libreng legal na tulong: AKSYON Fund at Legal Assistance Fund",
       "body_en": "The DMW's AKSYON Fund (Agarang Kalinga at Saklolo para sa mga OFW na Nangangailangan) provides legal, medical and financial help to distressed OFWs. RA 8042 also set up a Legal Assistance Fund for migrant workers. Ask the MWO or call 1348 about legal assistance.",
       "body_fil": "Ang AKSYON Fund ng DMW ay nagbibigay ng legal, medikal at pinansyal na tulong sa mga OFW na nangangailangan. May Legal Assistance Fund din sa ilalim ng RA 8042. Magtanong sa MWO o tumawag sa 1348.",
-      "source": {"label": "RA 11641 (DMW Act); RA 8042", "url": "https://gmanetwork.com/news/pinoyabroad/dispatch/942476/dmw-assures-support-for-ofws-with-legal-issues/story"}
+      "source": {"label": "RA 11641 (DMW Act); RA 8042", "url": "https://gmanetwork.com/news/pinoyabroad/dispatch/942476/dmw-assures-support-for-ofws-with-legal-issues/story"},
+      "keywords": ["libreng abogado", "abogado", "lawyer", "legal aid", "legal assistance", "tulong legal", "walang pambayad", "free lawyer"]
     },
     {
       "id": "pressure_to_sign",
@@ -261,7 +297,8 @@
       "title_fil": "Kung pinipilit kang pumirma ng bagong kontrata",
       "body_en": "You may ask for time and a copy before signing. Merely attempting to force a worker into a worse contract is itself unlawful. If you were made to sign, write down as soon as you can when and where it happened, who was there, and what was said. Take a photo of the document if it is safe. This record keeps your claim alive.",
       "body_fil": "Puwede kang humingi ng oras at kopya bago pumirma. Labag sa batas kahit ang pagtatangkang pilitin ka sa mas masamang kontrata. Kung napilitan kang pumirma, isulat agad kung kailan, saan, sino ang naroon at ano ang sinabi. Kunan ng litrato ang papel kung ligtas.",
-      "source": {"label": "RA 8042 Sec. 6; DMW rules", "url": "https://www.respicio.ph/commentaries/what-to-do-if-your-overseas-employment-contract-is-replaced-after-arrival"}
+      "source": {"label": "RA 8042 Sec. 6; DMW rules", "url": "https://www.respicio.ph/commentaries/what-to-do-if-your-overseas-employment-contract-is-replaced-after-arrival"},
+      "keywords": ["pinipilit pumirma", "pinapapirma", "pinapirma", "pressure", "napilitan", "pinilit", "airport", "sign"]
     },
     {
       "id": "phone_privacy",
@@ -271,7 +308,8 @@
       "title_fil": "Pag-iingat ng ebidensya sa phone mo",
       "body_en": "Some employers check or take workers' phones. Lock LakbAI with a PIN, use Quick exit if someone comes near, and send a copy of your report to someone you trust only when it is safe. LakbAI never uploads anything on its own.",
       "body_fil": "May mga employer na tumitingin o kumukuha ng phone ng manggagawa. I-lock ang LakbAI gamit ang PIN, gamitin ang Quick exit kung may lumapit, at magpadala lang ng kopya sa taong pinagkakatiwalaan kapag ligtas. Walang ina-upload ang LakbAI nang kusa.",
-      "source": {"label": "Digital privacy guide for migrant domestic workers", "url": "https://domesticworkerprivacy.github.io/"}
+      "source": {"label": "Digital privacy guide for migrant domestic workers", "url": "https://domesticworkerprivacy.github.io/"},
+      "keywords": ["cellphone", "cp", "tingnan", "tinitingnan", "sinisilip", "chinecheck", "kinuha ang cellphone", "privacy", "itago", "delete", "burahin"]
     },
     {
       "id": "country_hk_wage",
@@ -281,7 +319,8 @@
       "title_fil": "Hong Kong: minimum na sahod HK$5,220",
       "body_en": "For foreign domestic helper contracts signed on or after 3 October 2026, the Minimum Allowable Wage is HK$5,220 a month. If free food is not provided, the food allowance must be at least HK$1,236 a month. Only the standard contract (form ID407) is recognized for hiring helpers.",
       "body_fil": "Para sa kontrata ng domestic helper na pinirmahan mula 3 Oktubre 2026, HK$5,220 kada buwan ang minimum na sahod. Kung walang libreng pagkain, dapat hindi bababa sa HK$1,236 ang food allowance. Ang standard contract (ID407) lang ang kinikilala.",
-      "source": {"label": "HK Government announcement, Oct 2026", "url": "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/03/hong-kong-lifts-domestic-helpers-minimum-wage-by-235"}
+      "source": {"label": "HK Government announcement, Oct 2026", "url": "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/03/hong-kong-lifts-domestic-helpers-minimum-wage-by-235"},
+      "keywords": ["hong kong", "minimum allowable wage", "maw", "food allowance", "hk$", "minimum wage"]
     },
     {
       "id": "country_hk_rest",
@@ -291,7 +330,8 @@
       "title_fil": "Hong Kong: isang day off kada 7 araw",
       "body_en": "Domestic helpers in Hong Kong are entitled to at least one rest day in every seven days under the Employment Ordinance, as a continuous period of at least 24 hours. Making a helper work on a rest day breaches the law.",
       "body_fil": "Sa Hong Kong, may karapatan ang domestic helper sa hindi bababa sa isang day off kada pitong araw, na tuloy-tuloy na 24 oras. Labag sa batas ang pagpapatrabaho sa araw ng pahinga.",
-      "source": {"label": "HK Legislative Council reply (LCQ22)", "url": "https://www.info.gov.hk/gia/general/201607/06/P201607060482_print.htm"}
+      "source": {"label": "HK Legislative Council reply (LCQ22)", "url": "https://www.info.gov.hk/gia/general/201607/06/P201607060482_print.htm"},
+      "keywords": ["hong kong", "day off", "rest day", "sunday", "linggo"]
     },
     {
       "id": "country_sg_rest",
@@ -301,7 +341,8 @@
       "title_fil": "Singapore: kahit isang day off kada buwan na hindi puwedeng bayaran na lang",
       "body_en": "Since 1 January 2023, Singapore requires that migrant domestic workers get at least one rest day each month that cannot be compensated with money. Other rest days may be compensated only by agreement, and changes must be recorded with the Ministry of Manpower.",
       "body_fil": "Mula 1 Enero 2023, kailangang may kahit isang day off kada buwan ang domestic worker sa Singapore na hindi puwedeng palitan ng bayad. Ang ibang day off ay mapapalitan lang kung pumayag ka.",
-      "source": {"label": "Singapore MOM rest day guide", "url": "https://www.MOM.gov.sg/-/media/mom/documents/publications/guides/migrant-domestic-worker-rest-day-guide.pdf"}
+      "source": {"label": "Singapore MOM rest day guide", "url": "https://www.MOM.gov.sg/-/media/mom/documents/publications/guides/migrant-domestic-worker-rest-day-guide.pdf"},
+      "keywords": ["singapore", "mom", "rest day", "day off", "off day"]
     },
     {
       "id": "country_ksa_musaned",
@@ -311,7 +352,8 @@
       "title_fil": "Saudi Arabia: kontrata sa Musaned",
       "body_en": "Saudi Arabia documents domestic worker contracts through its Musaned e-contract service. Ask to see the Musaned contract and compare it with your DMW-verified contract. A difference in salary, job or rest days is a change you can report to the MWO.",
       "body_fil": "Sa Saudi Arabia, nakatala ang kontrata ng kasambahay sa Musaned. Hilingin na makita ang Musaned contract at ikumpara sa kontratang na-verify ng DMW. Ang anumang pagkakaiba sa sahod, trabaho o day off ay puwedeng i-report sa MWO.",
-      "source": {"label": "Saudi MHRSD Musaned e-contract", "url": "https://www.hrsd.gov.sa/en/media-center/news/151797"}
+      "source": {"label": "Saudi MHRSD Musaned e-contract", "url": "https://www.hrsd.gov.sa/en/media-center/news/151797"},
+      "keywords": ["musaned", "saudi", "ksa", "riyadh", "jeddah", "e-contract", "iqama"]
     },
     {
       "id": "what_to_compare",
@@ -321,7 +363,8 @@
       "title_fil": "Ano ang dapat ikumpara sa dalawang kontrata",
       "body_en": "Compare: salary amount and currency, working hours and daily rest, rest days, paid leave, job title and duties, employer name, worksite and country, contract length, food and lodging, airfare, deductions, and who keeps your passport. Any change for the worse needs DMW approval.",
       "body_fil": "Ikumpara: halaga at currency ng sahod, oras ng trabaho at pahinga, day off, bayad na bakasyon, posisyon at gawain, pangalan ng employer, lugar at bansa, haba ng kontrata, pagkain at tirahan, pamasahe, kaltas, at kung sino ang may hawak ng passport mo.",
-      "source": {"label": "GIZ guide for migrant workers", "url": "https://giz.de/de/downloads/giz2024-en-migrant-workers_employment-contract.pdf"}
+      "source": {"label": "GIZ guide for migrant workers", "url": "https://giz.de/de/downloads/giz2024-en-migrant-workers_employment-contract.pdf"},
+      "keywords": ["ikumpara", "ihambing", "compare", "pagkakaiba", "difference", "dalawang kontrata", "two contracts"]
     },
     {
       "id": "abuse_help",
@@ -331,7 +374,8 @@
       "title_fil": "Kung sinaktan, pinagbantaan o hindi pinapakain",
       "body_en": "Your safety comes first. If you are in immediate danger, call the local emergency number, then 1348 or the Philippine embassy. Ask the MWO for shelter. Write down dates and what happened, and photograph injuries if safe. You do not need to finish your contract to file a claim later.",
       "body_fil": "Kaligtasan mo ang una. Kung nasa agarang panganib, tumawag sa emergency number doon, saka sa 1348 o embahada. Humingi ng shelter sa MWO. Itala ang petsa at nangyari, at kunan ng litrato ang sugat kung ligtas. Hindi mo kailangang tapusin ang kontrata para makapagsampa.",
-      "source": {"label": "DMW / OWWA assistance", "url": "https://newsinfo.inquirer.net/?p=1102231"}
+      "source": {"label": "DMW / OWWA assistance", "url": "https://newsinfo.inquirer.net/?p=1102231"},
+      "keywords": ["sinaktan", "sinasaktan", "saktan", "binugbog", "binubugbog", "sinampal", "sinasampal", "pinalo", "pinapalo", "hindi pinapakain", "gutom", "feed", "hungry", "banta", "pinagbantaan", "kinulong", "nakakulong", "ikinulong", "hurt", "beaten", "hit", "abuse", "harassment", "hinipuan", "sick", "hospital"]
     },
     {
       "id": "ladder_overview",
@@ -341,7 +385,129 @@
       "title_fil": "Mga pagpipilian mo, mula pinakatahimik hanggang pormal",
       "body_en": "1) Keep the evidence quietly on your phone. 2) Ask privately by calling 1348. 3) Refuse to sign, or ask the MWO to check the new contract. 4) Get your money back through SEnA and the NLRC. 5) File against the agency at the DMW. 6) File a criminal case, or call 1343 for trafficking. You choose the step. Doing nothing yet still keeps your claim alive for 3 years.",
       "body_fil": "1) Itago muna ang ebidensya sa phone. 2) Magtanong nang pribado sa 1348. 3) Tumangging pumirma o ipa-check sa MWO. 4) Habulin ang pera sa SEnA at NLRC. 5) Magsampa laban sa ahensya sa DMW. 6) Kasong kriminal, o 1343 para sa trafficking. Ikaw ang pipili. Kahit hindi ka pa kumilos, buhay ang karapatan mo nang 3 taon.",
-      "source": {"label": "RA 8042; Labor Code; DMW rules", "url": "https://batasnatin.com/laws/migrant-workers-act-ra-8042-as-amended"}
+      "source": {"label": "RA 8042; Labor Code; DMW rules", "url": "https://batasnatin.com/laws/migrant-workers-act-ra-8042-as-amended"},
+      "keywords": ["opsyon", "options", "pagpipilian", "ano ang gagawin ko", "gagawin", "next step", "susunod", "choices"]
+    },
+    {
+      "id": "compulsory_insurance",
+      "kind": "law",
+      "topics": ["health", "agency", "help", "repatriation"],
+      "title_en": "Agency-hired workers get free compulsory insurance",
+      "title_fil": "May libreng insurance ang mga dumaan sa ahensya",
+      "body_en": "If an agency deployed you, it must insure you for free for your whole contract. The policy pays at least US$15,000 for accidental death, US$10,000 for natural death and US$7,500 for permanent total disability. It also covers repatriation if you are dismissed without valid cause, medical evacuation, and US$100 a month for up to 6 months while you have a case abroad. Ask your agency for the policy number.",
+      "body_fil": "Kung ahensya ang nag-deploy sa iyo, dapat ka nitong i-insure nang libre sa buong kontrata. Babayaran ng polisiya ang hindi bababa sa US$15,000 kung namatay sa aksidente, US$10,000 sa natural na pagkamatay, at US$7,500 sa permanenteng kapansanan. Sakop din ang pag-uwi kung tinanggal ka nang walang dahilan, medical evacuation, at US$100 kada buwan hanggang 6 na buwan habang may kaso ka sa abroad. Hingin sa ahensya ang policy number.",
+      "source": {"label": "RA 8042 Sec. 37-A (added by RA 10022)", "url": "https://lawphil.net/statutes/repacts/ra2010/ra_10022_2010.html"},
+      "keywords": ["insurance", "seguro", "insured", "nagkasakit", "may sakit", "sick", "hospital", "hospital bill", "ospital", "naaksidente", "aksidente", "accident", "disability", "kapansanan", "namatay", "death", "medical"]
+    },
+    {
+      "id": "owwa_membership",
+      "kind": "process",
+      "topics": ["help", "health", "repatriation"],
+      "title_en": "OWWA membership: welfare help and death benefits",
+      "title_fil": "OWWA membership: tulong at death benefits",
+      "body_en": "OWWA membership costs US$25 and is valid for 2 years. Active members can get welfare and repatriation help. Their families can claim PHP 200,000 for accidental death or PHP 100,000 for natural death, plus PHP 20,000 for burial. Keep your membership active, and call 1348 to ask about other OWWA programs.",
+      "body_fil": "US$25 ang OWWA membership at 2 taon itong valid. Puwedeng humingi ng welfare at tulong sa pag-uwi ang aktibong miyembro. Puwedeng mag-claim ang pamilya ng PHP 200,000 kung namatay sa aksidente o PHP 100,000 sa natural na pagkamatay, dagdag ang PHP 20,000 para sa libing. Panatilihing aktibo ang membership, at tumawag sa 1348 para sa iba pang programa ng OWWA.",
+      "source": {"label": "OWWA death and burial benefits (RA 10801, OWWA Act)", "url": "https://owwa.gov.ph"},
+      "keywords": ["owwa", "benepisyo", "benefits", "benefit", "death benefit", "burial", "libing", "namatay", "member", "miyembro", "membership", "scholarship", "welfare"]
+    },
+    {
+      "id": "unpaid_wages",
+      "kind": "process",
+      "topics": ["salary", "complaint", "agency"],
+      "title_en": "If your salary is late or unpaid",
+      "title_fil": "Kung late o hindi ibinibigay ang sahod mo",
+      "body_en": "Write down each month you were not paid and keep payslips, remittance receipts and chats. Unpaid salary can be claimed from your Philippine agency too, because it is jointly liable with the employer. You can report it to the Migrant Workers Office now, or file after you come home within 3 years.",
+      "body_fil": "Isulat ang bawat buwang hindi ka binayaran at itago ang payslip, resibo ng padala at mga chat. Puwedeng singilin ang hindi naibigay na sahod pati sa ahensya mo sa Pilipinas, dahil kasama itong mananagot. Puwede mo itong i-report sa Migrant Workers Office ngayon, o magsampa pag-uwi sa loob ng 3 taon.",
+      "source": {"label": "RA 8042 Sec. 10 as amended; Labor Code Art. 306", "url": "https://lawphil.net/statutes/repacts/ra2010/ra_10022_2010.html"},
+      "keywords": ["hindi pinapasahod", "pinapasahod", "hindi binabayaran", "binabayaran", "walang sahod", "late ang sahod", "delayed", "unpaid", "not paid", "hindi pa sumasahod", "sumasahod", "back pay", "buwan", "months"]
+    },
+    {
+      "id": "loans_deductions",
+      "kind": "law",
+      "topics": ["fees", "salary", "agency"],
+      "title_en": "Agency loans and salary deductions",
+      "title_fil": "Utang sa ahensya at kaltas sa sahod",
+      "body_en": "Domestic workers pay no placement fee, so no deduction from your salary can be taken for one. A loan for legal placement fees cannot charge more than 8% interest a year. No agency may force you to borrow from a lender it picks, or to use a clinic or training center it picks. Keep a record of every deduction.",
+      "body_fil": "Walang placement fee ang mga kasambahay, kaya bawal kaltasan ang sahod mo para dito. Ang pautang para sa legal na placement fee ay hindi puwedeng lumampas sa 8% na interes kada taon. Bawal kang pilitin ng ahensya na umutang sa lending na sila ang pumili, o magpa-medical o mag-training sa lugar na sila ang pumili. Itala ang bawat kaltas.",
+      "source": {"label": "RA 8042 Sec. 6 as amended by RA 10022", "url": "https://lawphil.net/statutes/repacts/ra2010/ra_10022_2010.html"},
+      "keywords": ["kaltas", "kinakaltasan", "binabawasan", "bawas", "binawasan", "deduction", "deductions", "loan", "utang", "mangutang", "umutang", "lending", "interes", "interest", "pautang", "nangutang", "pinilit"]
+    },
+    {
+      "id": "ran_away_shelter",
+      "kind": "safety",
+      "topics": ["abuse", "help", "complaint"],
+      "title_en": "If you left or want to leave your employer's house",
+      "title_fil": "Kung umalis ka o gusto mong umalis sa bahay ng amo",
+      "body_en": "Go straight to the Migrant Workers Office or the embassy. They run shelters for workers in distress and can help with food, a case or going home. Your employer may report you for absconding (huroob in Saudi Arabia), and the office can help you answer it. Do not sign papers you do not understand. Call 1348 if you cannot reach them.",
+      "body_fil": "Dumiretso sa Migrant Workers Office o sa embahada. May shelter sila para sa mga manggagawang nangangailangan at matutulungan ka sa pagkain, kaso o pag-uwi. Puwede kang i-report ng amo na 'tumakas' (huroob sa Saudi Arabia), at matutulungan ka ng opisina na sagutin ito. Huwag pumirma ng papel na hindi mo naiintindihan. Tumawag sa 1348 kung hindi mo sila maabot.",
+      "source": {"label": "RA 8042 Sec. 19 (Migrant Workers Resource Centers); DMW/OWWA", "url": "https://lawphil.net/statutes/repacts/ra1995/ra_8042_1995.html"},
+      "keywords": ["tumakas", "tatakas", "takas", "umalis sa amo", "umalis", "naglayas", "ran away", "runaway", "run away", "escape", "absconding", "huroob", "shelter", "bahay kalinga", "pupunta", "leave my employer"]
+    },
+    {
+      "id": "undocumented_help",
+      "kind": "process",
+      "topics": ["help", "complaint"],
+      "title_en": "No papers or an expired visa? You can still get help",
+      "title_fil": "Walang papeles o expired ang visa? Matutulungan ka pa rin",
+      "body_en": "Embassies, consulates and Migrant Workers Offices help Filipinos in distress even without papers. The Legal Assistance Fund covers overseas Filipinos in distress, not only agency-hired workers. Bring any ID you have, even a photo of your passport.",
+      "body_fil": "Tumutulong ang embahada, konsulado at Migrant Workers Office sa mga Pilipinong nangangailangan kahit wala silang papeles. Sakop ng Legal Assistance Fund ang mga Pilipino sa abroad na nasa gipit na sitwasyon, hindi lang ang dumaan sa ahensya. Dalhin ang anumang ID mo, kahit litrato ng passport.",
+      "source": {"label": "RA 8042 Sec. 25-26 (Legal Assistance Fund); DFA Assistance-to-Nationals", "url": "https://lawphil.net/statutes/repacts/ra1995/ra_8042_1995.html"},
+      "keywords": ["undocumented", "walang papeles", "papeles", "tnt", "overstay", "expired visa", "expired", "walang visa", "no papers", "illegal", "ilegal", "matutulungan"]
+    },
+    {
+      "id": "country_uae_domestic",
+      "kind": "country",
+      "topics": ["country_uae", "rest_day", "hours", "leave", "passport"],
+      "title_en": "UAE: rest, leave and passport rules for domestic workers",
+      "title_fil": "UAE: pahinga, bakasyon at passport ng kasambahay",
+      "body_en": "Under UAE Decree-Law No. 9 of 2022, a domestic worker gets one paid day off a week and at least 12 hours of rest a day, including 8 hours in a row. Paid annual leave is at least 30 days a year, with a ticket home every 2 years. You may keep your own passport and ID. The employer may hold them only for visa processing and must give them back.",
+      "body_fil": "Sa UAE Decree-Law No. 9 of 2022, may isang bayad na day off kada linggo ang kasambahay at hindi bababa sa 12 oras na pahinga kada araw, kasama ang 8 oras na tuloy-tuloy. May hindi bababa sa 30 araw na bayad na bakasyon kada taon, at ticket pauwi tuwing 2 taon. Ikaw ang may hawak ng passport at ID mo. Puwede lang itong hawakan ng amo habang inaayos ang visa, at dapat itong ibalik.",
+      "source": {"label": "UAE Federal Decree-Law No. 9 of 2022 on Domestic Workers", "url": "https://uaelegislation.gov.ae/en/legislations/1593"},
+      "keywords": ["uae", "dubai", "abu dhabi", "sharjah", "emirates", "sponsor", "kafeel", "mohre", "tadbeer", "keeps my passport"]
+    },
+    {
+      "id": "country_kw_domestic",
+      "kind": "country",
+      "topics": ["country_kw", "hours", "rest_day", "passport"],
+      "title_en": "Kuwait: hours, day off and passport for domestic workers",
+      "title_fil": "Kuwait: oras, day off at passport ng kasambahay",
+      "body_en": "Kuwait's Domestic Workers Law No. 68 of 2015 caps work at 12 hours a day with rest breaks, and gives one paid day off a week and paid annual leave. The employer may not keep your passport or civil ID without your agreement. When the contract ends you get one month's pay for each year of work.",
+      "body_fil": "Sa Domestic Workers Law No. 68 of 2015 ng Kuwait, hanggang 12 oras lang ang trabaho kada araw na may pahinga, may isang bayad na day off kada linggo, at may bayad na bakasyon kada taon. Hindi puwedeng hawakan ng amo ang passport o civil ID mo nang walang pahintulot mo. Pagtapos ng kontrata, may isang buwang sahod ka para sa bawat taon ng trabaho.",
+      "source": {"label": "Kuwait Law No. 68 of 2015 on Domestic Workers", "url": "https://gulfmigration.grc.net/kuwait-ministerial-decree-no-68-of-2015regarding-domestic-workers/"},
+      "keywords": ["kuwait", "kuwaiti", "civil id", "end of service", "kasambahay"]
+    },
+    {
+      "id": "country_qa_domestic",
+      "kind": "country",
+      "topics": ["country_qa", "salary", "hours", "rest_day", "leave"],
+      "title_en": "Qatar: minimum wage QR1,000 and rest rules",
+      "title_fil": "Qatar: minimum na sahod QR1,000 at pahinga",
+      "body_en": "Qatar's minimum basic wage is QR1,000 a month for all workers, including domestic workers. If the employer gives no food or housing, it must add QR300 for food and QR500 for housing. Domestic Workers Law No. 15 of 2017 limits work to 10 hours a day and gives one day off a week, 3 weeks of paid leave a year and end-of-service pay.",
+      "body_fil": "QR1,000 kada buwan ang minimum na basic na sahod sa Qatar para sa lahat ng manggagawa, kasama ang kasambahay. Kung walang pagkain o tirahan mula sa amo, dapat may dagdag na QR300 para sa pagkain at QR500 para sa tirahan. Sa Domestic Workers Law No. 15 of 2017, hanggang 10 oras lang ang trabaho kada araw, may isang day off kada linggo, 3 linggong bayad na bakasyon kada taon at end-of-service pay.",
+      "source": {"label": "Qatar Law No. 17 of 2020 (minimum wage); Law No. 15 of 2017 (domestic workers)", "url": "https://gulfmigration.grc.net/qatar-law-no-15-of-2017-regarding-domestic-workers/"},
+      "keywords": ["qatar", "doha", "qr", "qatari", "minimum wage", "kasambahay"]
+    },
+    {
+      "id": "country_hk_two_week",
+      "kind": "country",
+      "topics": ["country_hk", "contract", "repatriation"],
+      "title_en": "Hong Kong: the two-week rule after your contract ends",
+      "title_fil": "Hong Kong: ang two-week rule pagkatapos ng kontrata",
+      "body_en": "When a helper's contract ends or is terminated early, the helper may stay in Hong Kong for up to 14 days or until the visa expires, whichever comes first. Use that time to find a new employer, file a claim with the Labour Department, or arrange the trip home. If you have a pending case, ask the Immigration Department about an extension.",
+      "body_fil": "Kapag natapos o pinutol nang maaga ang kontrata, puwedeng manatili ang helper sa Hong Kong hanggang 14 na araw o hanggang mag-expire ang visa, alinman ang mauna. Gamitin ito para humanap ng bagong amo, magsampa ng claim sa Labour Department, o ayusin ang pag-uwi. Kung may kaso ka, magtanong sa Immigration Department tungkol sa extension.",
+      "source": {"label": "HK Immigration Department: foreign domestic helpers", "url": "https://www.immd.gov.hk/eng/services/visas/foreign_domestic_helpers.html"},
+      "keywords": ["two week rule", "two-week", "14 days", "14 na araw", "ilang araw", "manatili", "stay", "terminated", "tinerminate", "natapos", "finished contract", "immigration", "extension", "labour department", "break contract"]
+    },
+    {
+      "id": "country_hk_agency_fee",
+      "kind": "country",
+      "topics": ["country_hk", "fees", "agency"],
+      "title_en": "Hong Kong: agencies may charge at most 10% of your first month's pay",
+      "title_fil": "Hong Kong: hanggang 10% lang ng unang buwang sahod ang singil ng agency",
+      "body_en": "A Hong Kong employment agency may charge a job seeker no more than 10% of the first month's wages, and only after you get the job. Charging more is an offence. Ask for a receipt for every payment, and report overcharging to the Labour Department's Employment Agencies Administration.",
+      "body_fil": "Hanggang 10% lang ng unang buwang sahod ang puwedeng singilin ng employment agency sa Hong Kong, at pagkatapos mo lang makuha ang trabaho. Krimen ang sumobra rito. Humingi ng resibo sa bawat bayad, at i-report ang sobrang singil sa Employment Agencies Administration ng Labour Department.",
+      "source": {"label": "HK Employment Agency Regulations (Cap. 57A)", "url": "https://www.eaa.labour.gov.hk/en/"},
+      "keywords": ["agency fee", "commission", "singil", "magkano", "how much", "charge", "overcharging", "sobrang singil", "10%"]
     }
   ]
 }

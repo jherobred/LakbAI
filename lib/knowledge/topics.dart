@@ -20,7 +20,8 @@ const kTopics = <Topic>[
   ]),
   Topic('salary', 'Salary', 'Sahod', Icons.payments_rounded, Color(0xFF0EA5E9), [
     'salary', 'sahod', 'sweldo', 'suweldo', 'sueldo', 'wage', 'wages', 'pay', 'paid', 'payment', 'kita',
-    'allowance', 'minimum wage', 'underpaid', 'kulang', 'dollars', 'usd', 'riyal', 'riyals', 'dirham', 'dinar', 'hkd'
+    'allowance', 'minimum wage', 'underpaid', 'kulang', 'dollars', 'usd', 'riyal', 'riyals', 'dirham', 'dinar', 'hkd',
+    'pinapasahod', 'sumasahod', 'pasahod', 'binabayaran', 'unpaid'
   ]),
   Topic('hours', 'Work hours', 'Oras ng trabaho', Icons.schedule_rounded, Color(0xFF6366F1), [
     'hours', 'hour', 'oras', 'overtime', 'working hours', 'oras ng trabaho', 'puyat', 'walang tulog', 'buong araw', 'tulog'
@@ -43,7 +44,8 @@ const kTopics = <Topic>[
   ]),
   Topic('fees', 'Fees', 'Bayarin', Icons.receipt_long_rounded, Color(0xFFF59E0B), [
     'fee', 'fees', 'placement fee', 'bayad', 'binayaran', 'singil', 'sinisingil', 'utang', 'loan', 'deduction',
-    'kaltas', 'binawas', 'deposit'
+    'kaltas', 'binawas', 'deposit', 'binabawasan', 'bawas', 'kinakaltasan', 'lending', 'pautang', 'interes', 'interest',
+    'mangutang', 'umutang'
   ]),
   Topic('recruiter', 'Recruiter', 'Recruiter', Icons.person_search_rounded, Color(0xFFF97316), [
     'recruiter', 'handler', 'illegal recruiter', 'illegal recruitment', 'scam', 'budol', 'fixer', 'na-scam'
@@ -53,11 +55,12 @@ const kTopics = <Topic>[
   ]),
   Topic('abuse', 'Abuse', 'Pang-aabuso', Icons.report_rounded, Color(0xFFE11D48), [
     'abuse', 'abused', 'binugbog', 'sinaktan', 'sinampal', 'pinalo', 'maltrato', 'harassment', 'hinipuan',
-    'ginahasa', 'banta', 'threat', 'threatened', 'pinagbantaan', 'kinulong'
+    'ginahasa', 'banta', 'threat', 'threatened', 'pinagbantaan', 'kinulong', 'sinasaktan', 'binubugbog', 'sinasampal',
+    'pinapalo', 'nakakulong', 'ikinulong', 'hurt', 'beaten'
   ]),
   Topic('complaint', 'Complaint', 'Reklamo', Icons.gavel_rounded, Color(0xFF1D4ED8), [
     'complaint', 'complain', 'reklamo', 'kaso', 'magsampa', 'isampa', 'sumbong', 'nlrc', 'dmw', 'mwo', 'polo',
-    'sena', 'report', 'i-report', 'legal action', 'demanda'
+    'sena', 'report', 'i-report', 'legal action', 'demanda', 'magreklamo', 'magrereklamo', 'nagreklamo'
   ]),
   Topic('evidence', 'Evidence', 'Ebidensya', Icons.photo_library_rounded, Color(0xFF0891B2), [
     'evidence', 'ebidensya', 'proof', 'patunay', 'litrato', 'picture', 'photo', 'screenshot', 'recording'
@@ -67,21 +70,22 @@ const kTopics = <Topic>[
   ]),
   Topic('help', 'Get help', 'Tulong', Icons.support_agent_rounded, Color(0xFF16A34A), [
     'help', 'tulong', 'tulungan', 'saklolo', 'emergency', 'hotline', '1348', '1343', 'embassy', 'embahada',
-    'konsulado', 'shelter'
+    'konsulado', 'shelter', 'owwa', 'tumakas', 'ran away', 'umalis sa amo', 'walang papeles', 'undocumented'
   ]),
   Topic('repatriation', 'Going home', 'Pag-uwi', Icons.flight_land_rounded, Color(0xFF0D9488), [
     'uwi', 'umuwi', 'pauwi', 'makauwi', 'repatriation', 'ticket', 'flight', 'airfare', 'pamasahe'
   ]),
   Topic('health', 'Health', 'Kalusugan', Icons.medical_services_rounded, Color(0xFFDB2777), [
-    'sick', 'may sakit', 'hospital', 'ospital', 'medical', 'gamot', 'injury', 'sugat'
+    'sick', 'may sakit', 'hospital', 'ospital', 'medical', 'gamot', 'injury', 'sugat', 'insurance', 'seguro', 'nagkasakit',
+    'aksidente', 'naaksidente'
   ]),
   Topic('country_hk', 'Hong Kong', 'Hong Kong', Icons.public_rounded, Color(0xFF2563EB), ['hong kong', 'hk']),
   Topic('country_sg', 'Singapore', 'Singapore', Icons.public_rounded, Color(0xFF2563EB), ['singapore', 'sg']),
   Topic('country_ksa', 'Saudi Arabia', 'Saudi Arabia', Icons.public_rounded, Color(0xFF2563EB),
       ['saudi', 'ksa', 'riyadh', 'jeddah', 'dammam', 'musaned']),
-  Topic('country_uae', 'UAE', 'UAE', Icons.public_rounded, Color(0xFF2563EB), ['uae', 'dubai', 'abu dhabi', 'sharjah']),
-  Topic('country_kw', 'Kuwait', 'Kuwait', Icons.public_rounded, Color(0xFF2563EB), ['kuwait']),
-  Topic('country_qa', 'Qatar', 'Qatar', Icons.public_rounded, Color(0xFF2563EB), ['qatar', 'doha']),
+  Topic('country_uae', 'UAE', 'UAE', Icons.public_rounded, Color(0xFF2563EB), ['uae', 'dubai', 'abu dhabi', 'sharjah', 'emirates']),
+  Topic('country_kw', 'Kuwait', 'Kuwait', Icons.public_rounded, Color(0xFF2563EB), ['kuwait', 'kuwaiti']),
+  Topic('country_qa', 'Qatar', 'Qatar', Icons.public_rounded, Color(0xFF2563EB), ['qatar', 'doha', 'qatari']),
 ];
 
 Topic? topicById(String id) => kTopics.where((t) => t.id == id).firstOrNull;
