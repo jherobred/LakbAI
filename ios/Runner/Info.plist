@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Kontrata uses the camera to scan your contract. Photos stay on this phone.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Kontrata turns your voice into text on this phone. Audio is never uploaded.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Pick a photo of your contract. It stays on this phone.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
