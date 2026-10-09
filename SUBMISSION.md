@@ -9,13 +9,13 @@ Contract substitution happens at an agency desk or on arrival abroad. There the 
 
 **What runs locally:** the language model (Qwen3 0.6B or Gemma 4 E2B, LiteRT-LM), speech-to-text (Whisper), contract text recognition (ML Kit), clause comparison, legal knowledge search, and PDF report generation.
 
-**What requires internet:** a one-time model download from Hugging Face, phone calls to hotlines, and sharing a report if the worker chooses to.
+**What requires internet:** nothing for the core app, since the AI and voice models ship inside the installer. Optional bigger models download once from Hugging Face. Phone calls to hotlines and sharing a report need signal.
 
 **Models used:** Qwen3 0.6B (Apache-2.0), Gemma 4 E2B (Apache-2.0), Whisper tiny/base (MIT), Google ML Kit Text Recognition v2.
 
 **Technologies and frameworks:** Flutter, flutter_edge_ai (LiteRT-LM), google_mlkit_text_recognition, camera, record, pdf.
 
-**APIs and cloud services:** Hugging Face for the model download only. Nothing else.
+**APIs and cloud services:** Hugging Face for fetching model files at build time and for optional bigger models. Nothing else.
 
 **Existing code and assets:** the Flutter app template and the WAV-to-PCM helper pattern from the flutter_edge_ai docs. The knowledge base and synthetic sample contracts were made during the hackathon.
 

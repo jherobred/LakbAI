@@ -10,8 +10,11 @@ import '../core/app_state.dart';
 import '../knowledge/topics.dart';
 import '../theme.dart';
 
-Future<T?> openPage<T>(BuildContext context, Widget page) =>
-    Navigator.of(context).push<T>(MaterialPageRoute(builder: (_) => page));
+Future<T?> openPage<T>(BuildContext context, Widget page) {
+  // Drop the keyboard first so the page does not resize mid-transition.
+  FocusManager.instance.primaryFocus?.unfocus();
+  return Navigator.of(context).push<T>(MaterialPageRoute(builder: (_) => page));
+}
 
 Future<void> callNumber(BuildContext context, String number) async {
   HapticFeedback.selectionClick();
@@ -176,17 +179,28 @@ class KCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final box = Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: gradient == null ? (color ?? cs.surface) : null,
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(22),
-        border: gradient == null ? Border.all(color: borderColor ?? cs.outlineVariant) : null,
-      ),
-      child: child,
+    // Flat tonal surface without an outline, as in Google's Material 3 apps.
+    final decoration = BoxDecoration(
+      color: gradient == null ? (color ?? cs.surfaceContainer) : null,
+      gradient: gradient,
+      borderRadius: BorderRadius.circular(24),
+      border: borderColor != null ? Border.all(color: borderColor!) : null,
     );
-    return onTap == null ? box : Pressable(onTap: onTap, child: box);
+    if (onTap == null) return Container(padding: padding, decoration: decoration, child: child);
+    return Material(
+      color: Colors.transparent,
+      child: Ink(
+        decoration: decoration,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onTap!();
+          },
+          child: Padding(padding: padding, child: child),
+        ),
+      ),
+    );
   }
 }
 
@@ -351,16 +365,16 @@ class ActionTile extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return KCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(14)),
-          child: Icon(icon, color: color, size: 24),
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
+          child: Icon(icon, color: color, size: 22),
         ),
-        const SizedBox(height: 12),
-        Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(height: 1.15)),
+        const Spacer(),
+        Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(height: 1.15, fontSize: 15)),
         const SizedBox(height: 4),
         Text(subtitle, style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant, height: 1.3), maxLines: 2, overflow: TextOverflow.ellipsis),
       ]),

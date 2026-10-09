@@ -81,6 +81,13 @@ class AppState extends ChangeNotifier {
 
   bool get isFil => lang == 'fil';
 
+  /// Whisper language for the microphone: 'tl' or 'en'. Follows the app language until changed.
+  String get voiceLang => _prefs.getString('voiceLang') ?? (isFil ? 'tl' : 'en');
+  set voiceLang(String v) {
+    _prefs.setString('voiceLang', v);
+    notifyListeners();
+  }
+
   MotionMode get motionMode => MotionMode.values[_prefs.getInt('motionMode') ?? MotionMode.auto.index];
   set motionMode(MotionMode v) {
     _prefs.setInt('motionMode', v.index);
@@ -152,12 +159,18 @@ class AppState extends ChangeNotifier {
     final salt = base64Url.encode(List<int>.generate(16, (_) => Random.secure().nextInt(256)));
     _prefs.setString('pinSalt', salt);
     _prefs.setString('pinHash', _hash(pin, salt));
+    _prefs.setInt('pinLength', pin.length);
     notifyListeners();
   }
+
+  /// Digits in the saved PIN. Null for PINs saved before the length was
+  /// stored; the first successful unlock records it.
+  int? get pinLength => _prefs.getInt('pinLength');
 
   void clearPin() {
     _prefs.remove('pinSalt');
     _prefs.remove('pinHash');
+    _prefs.remove('pinLength');
     notifyListeners();
   }
 
@@ -165,7 +178,9 @@ class AppState extends ChangeNotifier {
     final salt = _prefs.getString('pinSalt');
     final hash = _prefs.getString('pinHash');
     if (salt == null || hash == null) return true;
-    return _hash(pin, salt) == hash;
+    final ok = _hash(pin, salt) == hash;
+    if (ok && pinLength == null) _prefs.setInt('pinLength', pin.length);
+    return ok;
   }
 
   String _hash(String pin, String salt) => sha256.convert(utf8.encode('$salt:$pin')).toString();

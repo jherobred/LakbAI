@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,8 +32,13 @@ class KontrataApp extends StatelessWidget {
                 statusBarColor: Colors.transparent,
                 systemNavigationBarColor: Colors.transparent,
               ),
-              // Respect the phone's text size, but cap it so layouts stay usable.
-              child: MediaQuery.withClampedTextScaling(maxScaleFactor: 1.35, child: child!),
+              // A themed backdrop under every route, so fades never reveal the
+              // (white) native window behind Flutter.
+              child: ColoredBox(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                // Respect the phone's text size, but cap it so layouts stay usable.
+                child: MediaQuery.withClampedTextScaling(maxScaleFactor: 1.35, child: child!),
+              ),
             );
           },
           home: const _Root(),
@@ -82,12 +88,15 @@ class _RootState extends State<_Root> with WidgetsBindingObserver {
     } else {
       child = const ChatScreen(key: ValueKey('chat'));
     }
-    return AnimatedSwitcher(
-      duration: Motion.d(context, 450),
-      switchInCurve: Curves.easeOutCubic,
-      transitionBuilder: (c, a) => FadeTransition(
-        opacity: a,
-        child: ScaleTransition(scale: Tween(begin: 0.98, end: 1.0).animate(a), child: c),
+    // Fade-through: the old screen fades out fully before the new one fades
+    // in, over the themed background, so the two never blend into a flash.
+    return PageTransitionSwitcher(
+      duration: Motion.d(context, 420),
+      transitionBuilder: (c, a, b) => FadeThroughTransition(
+        animation: a,
+        secondaryAnimation: b,
+        fillColor: Theme.of(context).scaffoldBackgroundColor,
+        child: c,
       ),
       child: child,
     );

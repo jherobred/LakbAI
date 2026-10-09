@@ -372,15 +372,23 @@ class _AiSetup extends StatelessWidget {
                   ? Icon(Icons.check_rounded, key: const ValueKey('ok'), size: 64, color: KTokens.of(context).success)
                   : downloading
                       ? Text('${ai.progress}%', key: const ValueKey('pct'), style: Theme.of(context).textTheme.headlineMedium)
-                      : Icon(Icons.memory_rounded, key: const ValueKey('chip'), size: 58, color: cs.primary),
+                      : ai.status == AiStatus.loading
+                          ? const SizedBox.square(key: ValueKey('load'), dimension: 48, child: CircularProgressIndicator(strokeWidth: 4))
+                          : Icon(Icons.memory_rounded, key: const ValueKey('chip'), size: 58, color: cs.primary),
             ),
           ),
           title: ready
               ? tr(context, 'Offline AI is ready.', 'Handa na ang offline AI.')
-              : tr(context, 'Put the AI on your phone.', 'Ilagay ang AI sa phone mo.'),
-          body: tr(context,
-              'One download over Wi-Fi, then it works offline forever. Your phone has ${s.device.ramLabel} of memory, so we picked a model that fits.',
-              'Isang beses na download gamit ang Wi-Fi, tapos offline na ito habambuhay. May ${s.device.ramLabel} na memory ang phone mo, kaya pinili namin ang model na kasya.'),
+              : ai.modelBundled
+                  ? tr(context, 'Setting up the built-in AI…', 'Inihahanda ang built-in na AI…')
+                  : tr(context, 'Put the AI on your phone.', 'Ilagay ang AI sa phone mo.'),
+          body: ai.modelBundled
+              ? tr(context,
+                  'The AI and voice models came inside the app, so there is nothing to download. Bigger models below are optional.',
+                  'Kasama na sa app ang AI at voice model, kaya walang ida-download. Opsyonal ang mas malalaking model sa ibaba.')
+              : tr(context,
+                  'One download over Wi-Fi, then it works offline forever. Your phone has ${s.device.ramLabel} of memory, so we picked a model that fits.',
+                  'Isang beses na download gamit ang Wi-Fi, tapos offline na ito habambuhay. May ${s.device.ramLabel} na memory ang phone mo, kaya pinili namin ang model na kasya.'),
           extra: Column(children: [
             for (final m in kModels) _ModelCard(model: m, recommended: m.id == rec.id),
             const SizedBox(height: 8),
@@ -433,6 +441,7 @@ class _ModelCard extends StatelessWidget {
     final isActive = ai.active?.id == model.id;
     final installed = s.installedModelId == model.id;
     final tooBig = model.tier.index > s.device.tier.index;
+    final builtIn = model.id == kBundledModelId && ai.modelBundled;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: KCard(
@@ -444,17 +453,19 @@ class _ModelCard extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Flexible(child: Text(model.name, style: Theme.of(context).textTheme.titleMedium)),
-                if (recommended) ...[
+                if (recommended || builtIn) ...[
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(color: cs.primary, borderRadius: BorderRadius.circular(99)),
-                    child: Text(tr(context, 'Best for you', 'Pinakaangkop'), style: TextStyle(color: cs.onPrimary, fontSize: 11, fontWeight: FontWeight.w800)),
+                    child: Text(builtIn ? tr(context, 'Built in', 'Kasama na') : tr(context, 'Best for you', 'Pinakaangkop'),
+                        style: TextStyle(color: cs.onPrimary, fontSize: 11, fontWeight: FontWeight.w800)),
                   ),
                 ],
               ]),
               const SizedBox(height: 3),
-              Text('${model.sizeLabel} · ${s.isFil ? model.blurbFil : model.blurbEn}', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
+              Text('${builtIn ? tr(context, 'No download', 'Walang download') : model.sizeLabel} · ${s.isFil ? model.blurbFil : model.blurbEn}',
+                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
               if (tooBig)
                 Text(tr(context, 'May be slow or close on this phone', 'Puwedeng bumagal o mag-close sa phone na ito'),
                     style: TextStyle(color: KTokens.of(context).warning, fontSize: 12, fontWeight: FontWeight.w600)),
@@ -463,6 +474,8 @@ class _ModelCard extends StatelessWidget {
           const SizedBox(width: 10),
           if (installed && ai.ready)
             Icon(Icons.check_circle_rounded, color: KTokens.of(context).success)
+          else if (isActive && ai.status == AiStatus.loading)
+            const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 3))
           else if (isActive && ai.status == AiStatus.downloading)
             SizedBox.square(dimension: 26, child: CircularProgressIndicator(value: ai.progress / 100, strokeWidth: 3))
           else
@@ -488,8 +501,8 @@ class _VoiceCard extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(tr(context, 'Voice input (optional)', 'Boses (opsyonal)'), style: Theme.of(context).textTheme.titleMedium),
-            Text('${v.name} · ${v.sizeMb} MB · ${tr(context, 'speech-to-text on your phone', 'speech-to-text sa phone mo')}',
+            Text(ai.voiceBundled ? tr(context, 'Voice input', 'Boses') : tr(context, 'Voice input (optional)', 'Boses (opsyonal)'), style: Theme.of(context).textTheme.titleMedium),
+            Text('${v.name} · ${ai.voiceBundled ? tr(context, 'built in', 'kasama na') : '${v.sizeMb} MB'} · ${tr(context, 'speech-to-text on your phone', 'speech-to-text sa phone mo')}',
                 style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13)),
           ]),
         ),

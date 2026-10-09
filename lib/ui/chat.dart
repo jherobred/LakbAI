@@ -8,6 +8,7 @@ import '../core/app_state.dart';
 import '../knowledge/kb.dart';
 import '../knowledge/topics.dart';
 import '../theme.dart';
+import 'ai_widgets.dart';
 import 'cases_screen.dart';
 import 'ladder.dart';
 import 'recruiter.dart';
@@ -28,6 +29,9 @@ class ChatMessage {
   List<String> sources;
   bool streaming;
   bool animated = false;
+
+  /// Whether the on-device model wrote this reply (false: the built-in guide did).
+  bool byAi = false;
 }
 
 /// Highlights topic keywords inside the text field as the user types.
@@ -71,11 +75,13 @@ class _ChatScreenState extends State<ChatScreen> {
   final Set<String> _dismissed = {};
   List<Topic> _typed = [];
   bool _generating = false;
+  late final _voice = VoiceCapture(onAutoStop: _finishVoice);
 
   @override
   void initState() {
     super.initState();
     _input.addListener(_onTyping);
+    _focus.addListener(() => setState(() {}));
   }
 
   @override
@@ -83,6 +89,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _input.dispose();
     _focus.dispose();
     _scroll.dispose();
+    _voice.dispose();
     super.dispose();
   }
 
@@ -104,11 +111,12 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _send([String? preset]) async {
     final text = (preset ?? _input.text).trim();
     if (text.isEmpty || _generating) return;
-    final fil = AppScope.read(context).isFil;
+    final fil = looksFilipino(text, fallback: AppScope.read(context).isFil);
     final topics = {...KeywordDetector.instance.topicsIn(text).map((t) => t.id), ..._activeTopics};
     HapticFeedback.lightImpact();
     final user = ChatMessage(fromUser: true, text: text, topics: topics);
-    final kb = KnowledgeBase.instance.search(text, topics: topics, k: 3);
+    // Two entries keep the prompt short, which is what makes the first word come fast.
+    final kb = KnowledgeBase.instance.search(text, topics: topics, k: 2);
     final reply = ChatMessage(fromUser: false, text: '', topics: topics, sources: kb.map((e) => e.id).toList(), streaming: true);
     setState(() {
       _messages.addAll([user, reply]);
@@ -118,20 +126,33 @@ class _ChatScreenState extends State<ChatScreen> {
       _generating = true;
     });
     _focus.unfocus();
+    if (_scroll.hasClients) _scroll.animateTo(0, duration: Motion.d(context, 300), curve: Curves.easeOutCubic);
 
     final ai = AiService.instance;
     try {
       if (ai.ready) {
+        reply.byAi = true;
         final last = _lastExchange();
-        await for (final tok in ai.ask(system: systemPrompt(fil: fil), prompt: buildPrompt(question: text, context: kb, fil: fil, lastExchange: last))) {
-          reply.text.value = cleanModelText(reply.text.value + tok);
+        // Keep the raw stream and show a cleaned copy, so line breaks between tokens survive.
+        final raw = StringBuffer();
+        await for (final tok in ai.ask(
+          system: systemPrompt(fil: fil),
+          prompt: buildPrompt(question: text, context: kb, fil: fil, lastExchange: last),
+          maxOutputTokens: 260,
+        )) {
+          raw.write(tok);
+          reply.text.value = cleanModelText(raw.toString());
         }
-        if (reply.text.value.trim().isEmpty) reply.text.value = extractiveAnswer(kb, fil: fil);
+        if (reply.text.value.trim().isEmpty) {
+          reply.byAi = false;
+          reply.text.value = extractiveAnswer(kb, fil: fil);
+        }
       } else {
-        await Future<void>.delayed(const Duration(milliseconds: 350));
+        await Future<void>.delayed(const Duration(milliseconds: 250));
         reply.text.value = extractiveAnswer(kb, fil: fil);
       }
     } catch (e) {
+      reply.byAi = false;
       reply.text.value = extractiveAnswer(kb, fil: fil);
     } finally {
       reply.streaming = false;
@@ -144,16 +165,36 @@ class _ChatScreenState extends State<ChatScreen> {
     final q = _messages[_messages.length - 4];
     final a = _messages[_messages.length - 3];
     final ans = a.text.value;
-    return 'Worker: ${q.text.value}\nKontrata: ${ans.length > 300 ? '${ans.substring(0, 300)}…' : ans}';
+    return 'Worker: ${q.text.value}\nKontrata: ${ans.length > 240 ? '${ans.substring(0, 240)}…' : ans}';
   }
 
-  Future<void> _voice() async {
-    final text = await showVoiceSheet(context);
-    if (text == null || text.isEmpty || !mounted) return;
-    _input.text = text;
-    _input.selection = TextSelection.collapsed(offset: text.length);
-    _focus.requestFocus();
+  Future<void> _startVoice() async {
+    if (!AiService.instance.voiceReady) {
+      // Voice is still being set up (or needs its one-time download): use the sheet that explains it.
+      final text = await showVoiceSheet(context);
+      if (text != null && text.isNotEmpty && mounted) _send(text);
+      return;
+    }
+    _focus.unfocus();
+    final ok = await _voice.start(permissionMessage: tr(context, 'Allow the microphone in Settings to talk.', 'Payagan ang mikropono sa Settings para makapagsalita.'));
+    if (!ok && mounted) _snack(_voice.error ?? '');
   }
+
+  Future<void> _finishVoice() async {
+    if (_voice.phase != VoicePhase.recording) return;
+    final text = await _voice.finish(AppScope.read(context).voiceLang);
+    if (!mounted) return;
+    if (_voice.phase == VoicePhase.error) {
+      _snack(tr(context, 'Could not turn that into text. Try again.', 'Hindi ito nagawang text. Subukan ulit.'));
+      _voice.cancel();
+    } else if (text.isEmpty) {
+      _snack(tr(context, "I didn't catch that. Try again a little closer.", 'Hindi ko narinig. Subukan ulit nang mas malapit.'));
+    } else {
+      _send(text);
+    }
+  }
+
+  void _snack(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
 
   List<ChatMessage> get _visible {
     if (_activeTopics.isEmpty) return _messages;
@@ -162,13 +203,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final filtering = _activeTopics.isNotEmpty;
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16,
         title: Row(children: [
-          const KLogo(size: 32),
+          const KLogo(size: 30),
           const SizedBox(width: 10),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('Kontrata'),
@@ -180,12 +220,12 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
             tooltip: tr(context, 'My saved cases', 'Mga naitalang kaso'),
             onPressed: () => openPage(context, const CasesScreen()),
-            icon: const Icon(Icons.folder_shared_rounded),
+            icon: const Icon(Icons.folder_outlined),
           ),
           IconButton(
             tooltip: tr(context, 'Settings', 'Settings'),
             onPressed: () => openPage(context, const SettingsScreen()),
-            icon: const Icon(Icons.tune_rounded),
+            icon: const Icon(Icons.settings_outlined),
           ),
           IconButton(
             tooltip: tr(context, 'Quick exit', 'Mabilis na labas'),
@@ -204,6 +244,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: AnimatedSwitcher(
               duration: Motion.d(context, 300),
+              switchInCurve: Curves.easeOutCubic,
+              transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
               child: _messages.isEmpty && !filtering
                   ? _Welcome(key: const ValueKey('welcome'), onAsk: _send)
                   : _MessageList(
@@ -226,14 +268,15 @@ class _ChatScreenState extends State<ChatScreen> {
           _Composer(
             controller: _input,
             focus: _focus,
+            voice: _voice,
             generating: _generating,
             onSend: () => _send(),
             onStop: AiService.instance.stop,
-            onMic: _voice,
+            onMic: _startVoice,
+            onVoiceDone: _finishVoice,
           ),
         ]),
       ),
-      backgroundColor: cs.surfaceContainerLowest,
     );
   }
 }
@@ -247,92 +290,149 @@ class _Welcome extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final t = KTokens.of(context);
     final d = Motion.d(context, 420);
-    final suggestions = [
-      tr(context, 'My contract was changed when I arrived', 'Pinalitan ang kontrata ko pagdating ko'),
-      tr(context, 'What should my minimum salary be?', 'Magkano dapat ang minimum na sahod ko?'),
-      tr(context, 'My employer took my passport', 'Kinuha ng employer ang passport ko'),
-      tr(context, 'Is it too late to file a complaint?', 'Huli na ba para magsampa ng reklamo?'),
+    final suggestions = <(IconData, Color, String)>[
+      (Icons.description_outlined, const Color(0xFF4285F4), tr(context, 'My contract was changed when I arrived', 'Pinalitan ang kontrata ko pagdating ko')),
+      (Icons.payments_outlined, const Color(0xFF0F9D58), tr(context, 'What should my minimum salary be?', 'Magkano dapat ang minimum na sahod ko?')),
+      (Icons.badge_outlined, const Color(0xFF9B72CB), tr(context, 'My employer took my passport', 'Kinuha ng employer ang passport ko')),
+      (Icons.event_outlined, const Color(0xFFE37400), tr(context, 'Is it too late to file a complaint?', 'Huli na ba para magsampa ng reklamo?')),
     ];
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(gradient: t.hero, borderRadius: BorderRadius.circular(26)),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(tr(context, 'Kumusta, kabayan.', 'Kumusta, kabayan.'),
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white)),
-            const SizedBox(height: 6),
-            Text(
-              tr(context, 'Ask me anything about your contract and rights. I answer from Philippine law, right here on your phone.',
-                  'Itanong mo ang kahit ano tungkol sa kontrata at karapatan mo. Sasagot ako batay sa batas ng Pilipinas, dito mismo sa phone mo.'),
-              style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.4),
+        GradientGreeting(
+          tr(context, 'Kumusta, kabayan.', 'Kumusta, kabayan.'),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w500, fontSize: 32),
+        ).animate().fadeIn(duration: d).slideY(begin: 0.15, curve: Curves.easeOutCubic),
+        const SizedBox(height: 4),
+        Text(
+          tr(context, 'How can I help with your contract today?', 'Paano kita matutulungan sa kontrata mo ngayon?'),
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: cs.onSurfaceVariant.withValues(alpha: 0.75), fontSize: 24, height: 1.25),
+        ).animate().fadeIn(duration: d, delay: 80.ms).slideY(begin: 0.15, curve: Curves.easeOutCubic),
+        const SizedBox(height: 22),
+        // Main tool, with an illustration of what it does.
+        Material(
+          color: Colors.transparent,
+          child: Ink(
+            decoration: BoxDecoration(gradient: t.hero, borderRadius: BorderRadius.circular(28)),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(28),
+              onTap: () => openPage(context, const ScanFlowScreen()),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 14, 18),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(tr(context, 'Compare my contracts', 'Ikumpara ang kontrata ko'),
+                          style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 6),
+                      Text(
+                        tr(context, 'Scan the verified contract and the new one. I will find every change.', 'I-scan ang verified na kontrata at ang bago. Hahanapin ko ang bawat pagbabago.'),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.88), fontSize: 13.5, height: 1.35),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99)),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          const Icon(Icons.document_scanner_outlined, size: 18, color: KColors.lPrimary),
+                          const SizedBox(width: 6),
+                          Text(tr(context, 'Start scan', 'Mag-scan'), style: const TextStyle(color: KColors.lPrimary, fontWeight: FontWeight.w600)),
+                        ]),
+                      ),
+                    ]),
+                  ),
+                  const ContractArt(size: 104),
+                ]),
+              ),
             ),
-            const SizedBox(height: 14),
-            FilledButton.icon(
-              style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: KColors.lPrimary, minimumSize: const Size(0, 50)),
-              onPressed: () => openPage(context, const ScanFlowScreen()),
-              icon: const Icon(Icons.document_scanner_rounded),
-              label: Text(tr(context, 'Compare my contracts', 'Ikumpara ang kontrata ko')),
-            ),
-          ]),
-        ).animate().fadeIn(duration: d).slideY(begin: 0.08, curve: Curves.easeOutCubic),
-        const SizedBox(height: 14),
+          ),
+        ).animate().fadeIn(duration: d, delay: 140.ms).slideY(begin: 0.1, curve: Curves.easeOutCubic),
+        const SizedBox(height: 18),
+        Text(tr(context, 'Try asking', 'Subukang itanong'), style: TextStyle(fontWeight: FontWeight.w600, color: cs.onSurfaceVariant)),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 136,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            itemCount: suggestions.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final (icon, color, text) = suggestions[i];
+              return SizedBox(
+                width: 168,
+                child: Material(
+                  color: cs.surfaceContainer,
+                  borderRadius: BorderRadius.circular(20),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => onAsk(text),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Expanded(child: Text(text, style: const TextStyle(fontSize: 14.5, height: 1.35), maxLines: 4, overflow: TextOverflow.ellipsis)),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            padding: const EdgeInsets.all(7),
+                            decoration: BoxDecoration(color: cs.surface, shape: BoxShape.circle),
+                            child: Icon(icon, size: 18, color: color),
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ),
+                ),
+              ).animate().fadeIn(duration: d, delay: (200 + i * 60).ms).slideX(begin: 0.15, curve: Curves.easeOutCubic);
+            },
+          ),
+        ),
+        const SizedBox(height: 18),
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.12,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 1.05,
           children: [
             ActionTile(
-              icon: Icons.person_search_rounded,
-              color: const Color(0xFFF97316),
+              icon: Icons.person_search_outlined,
+              color: const Color(0xFFE37400),
               title: tr(context, 'Check my recruiter', 'I-check ang recruiter'),
               subtitle: tr(context, 'Spot illegal recruitment', 'Alamin kung illegal'),
               onTap: () => openPage(context, const RecruiterCheckScreen()),
             ),
             ActionTile(
-              icon: Icons.route_rounded,
+              icon: Icons.route_outlined,
               color: t.success,
               title: tr(context, 'My options', 'Mga puwede kong gawin'),
               subtitle: tr(context, 'From quiet to formal', 'Mula tahimik hanggang pormal'),
               onTap: () => openPage(context, const LadderScreen()),
             ),
             ActionTile(
-              icon: Icons.menu_book_rounded,
+              icon: Icons.menu_book_outlined,
               color: cs.primary,
               title: tr(context, 'Know your rights', 'Alamin ang karapatan'),
               subtitle: tr(context, 'Laws, explained simply', 'Batas, sa simpleng salita'),
               onTap: () => openPage(context, const RightsScreen()),
             ),
             ActionTile(
-              icon: Icons.support_agent_rounded,
+              icon: Icons.support_agent_outlined,
               color: t.danger,
               title: tr(context, 'Get help now', 'Humingi ng tulong'),
               subtitle: '1348 · 1343',
               onTap: () => openPage(context, const LadderScreen(scrollToHotlines: true)),
             ),
-          ].animate(interval: 70.ms).fadeIn(duration: d).scaleXY(begin: 0.94, curve: Curves.easeOutCubic),
+          ].animate(interval: 60.ms, delay: 300.ms).fadeIn(duration: d).scaleXY(begin: 0.96, curve: Curves.easeOutCubic),
         ),
-        SectionLabel(tr(context, 'Try asking', 'Subukang itanong')),
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          for (final s in suggestions)
-            ActionChip(
-              label: Text(s),
-              onPressed: () => onAsk(s),
-              avatar: Icon(Icons.chat_bubble_outline_rounded, size: 16, color: cs.primary),
-            ),
-        ].animate(interval: 60.ms).fadeIn(duration: d).slideX(begin: 0.1)),
-        const SizedBox(height: 10),
+        const SizedBox(height: 14),
         Row(children: [
-          Icon(Icons.tips_and_updates_rounded, size: 16, color: cs.onSurfaceVariant),
+          Icon(Icons.lock_outline_rounded, size: 15, color: cs.onSurfaceVariant),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
-              tr(context, 'Tip: words like "sahod" or "passport" turn into filters as you type.',
-                  'Tip: ang mga salitang tulad ng "sahod" o "passport" ay nagiging filter habang nagta-type ka.'),
+              tr(context, 'Everything stays on this phone. Works in airplane mode.', 'Nasa phone mo lang ang lahat. Gumagana kahit naka-airplane mode.'),
               style: TextStyle(fontSize: 12.5, color: cs.onSurfaceVariant),
             ),
           ),
@@ -356,7 +456,7 @@ class _MessageList extends StatelessWidget {
         ? KnowledgeBase.instance.search(filterTopics.map((t) => t.en).join(' '), topics: filterTopics.map((t) => t.id).toSet(), k: 2)
         : const <KbEntry>[];
     final items = <Widget>[
-      for (final m in messages) _Bubble(key: ValueKey(m.id), message: m),
+      for (final m in messages) m.fromUser ? _UserBubble(key: ValueKey(m.id), message: m) : _AiReply(key: ValueKey(m.id), message: m),
       if (filtering && messages.isEmpty)
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
@@ -392,14 +492,13 @@ class _KbPreview extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return KCard(
       padding: const EdgeInsets.all(14),
-      color: cs.secondaryContainer.withValues(alpha: 0.5),
       onTap: () => showKbSheet(context, entry),
       child: Row(children: [
-        Icon(Icons.menu_book_rounded, color: cs.primary, size: 20),
+        Icon(Icons.menu_book_outlined, color: cs.primary, size: 20),
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(entry.title(fil), style: const TextStyle(fontWeight: FontWeight.w700)),
+            Text(entry.title(fil), style: const TextStyle(fontWeight: FontWeight.w600)),
             Text(entry.sourceLabel, style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
           ]),
         ),
@@ -409,119 +508,172 @@ class _KbPreview extends StatelessWidget {
   }
 }
 
-class _Bubble extends StatelessWidget {
-  const _Bubble({super.key, required this.message});
+/// Entrance motion shared by both sides of the conversation; plays once per message.
+Widget _enter(BuildContext context, ChatMessage m, Widget child, {required bool user}) {
+  if (m.animated || Motion.reduced(context)) return child;
+  m.animated = true;
+  return child
+      .animate()
+      .fadeIn(duration: Motion.d(context, 260))
+      .slideY(begin: 0.2, curve: Curves.easeOutCubic, duration: Motion.d(context, 340))
+      .scaleXY(begin: 0.97, alignment: user ? Alignment.bottomRight : Alignment.bottomLeft, curve: Curves.easeOutCubic);
+}
+
+class _UserBubble extends StatelessWidget {
+  const _UserBubble({super.key, required this.message});
   final ChatMessage message;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final t = KTokens.of(context);
     final fil = AppScope.of(context).isFil;
-    final user = message.fromUser;
     final bubble = Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.84),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
+      padding: const EdgeInsets.fromLTRB(16, 11, 16, 11),
       decoration: BoxDecoration(
-        gradient: user ? t.userBubble : null,
-        color: user ? null : cs.surface,
-        borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(22),
-          topRight: const Radius.circular(22),
-          bottomLeft: Radius.circular(user ? 22 : 6),
-          bottomRight: Radius.circular(user ? 6 : 22),
+        color: KTokens.of(context).userBubble,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(6),
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
         ),
-        border: user ? null : Border.all(color: cs.outlineVariant),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        ValueListenableBuilder<String>(
-          valueListenable: message.text,
-          builder: (context, text, _) {
-            if (text.isEmpty && message.streaming) return const _TypingDots();
-            return SelectableText(
-              text,
-              style: TextStyle(color: user ? Colors.white : cs.onSurface, fontSize: 15.5, height: 1.45),
-            );
-          },
-        ),
-        if (!user && message.sources.isNotEmpty) ...[
-          const SizedBox(height: 10),
-          Wrap(spacing: 6, runSpacing: 6, children: [
-            for (final id in message.sources.take(3))
-              if (KnowledgeBase.instance.byId(id) case final e?)
-                Pressable(
-                  onTap: () => showKbSheet(context, e),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                    decoration: BoxDecoration(color: cs.primaryContainer.withValues(alpha: 0.6), borderRadius: BorderRadius.circular(99)),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(Icons.gavel_rounded, size: 12, color: cs.primary),
-                      const SizedBox(width: 4),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 200),
-                        child: Text(e.sourceLabel, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: cs.primary)),
-                      ),
-                    ]),
-                  ),
-                ),
-          ]),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisSize: MainAxisSize.min, children: [
+        SelectableText(message.text.value, style: TextStyle(color: cs.onSurface, fontSize: 15.5, height: 1.45)),
+        if (message.topics.isNotEmpty) ...[
           const SizedBox(height: 6),
-          Text(
-            AiService.instance.ready ? tr(context, 'Answered offline by on-device AI', 'Sinagot offline ng AI sa phone') : tr(context, 'From the built-in legal guide', 'Mula sa built-in na legal guide'),
-            style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant),
-          ),
-        ],
-        if (user && message.topics.isNotEmpty) ...[
-          const SizedBox(height: 8),
           Wrap(spacing: 4, runSpacing: 4, children: [
             for (final id in message.topics.take(4))
               if (topicById(id) case final tp?)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(99)),
-                  child: Text('#${tp.label(fil).toLowerCase()}', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(color: tp.color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(99)),
+                  child: Text('#${tp.label(fil).toLowerCase()}', style: TextStyle(color: tp.color, fontSize: 11, fontWeight: FontWeight.w600)),
                 ),
           ]),
         ],
       ]),
     );
-    final row = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      child: Row(
-        mainAxisAlignment: user ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (!user) ...[const KLogo(size: 26), const SizedBox(width: 6)],
-          Flexible(child: bubble),
-        ],
+    return _enter(
+      context,
+      message,
+      Padding(
+        padding: const EdgeInsets.fromLTRB(48, 8, 14, 8),
+        child: Align(alignment: Alignment.centerRight, child: bubble),
       ),
+      user: true,
     );
-    if (message.animated || Motion.reduced(context)) return row;
-    message.animated = true;
-    return row
-        .animate()
-        .fadeIn(duration: Motion.d(context, 260))
-        .slideY(begin: 0.25, curve: Curves.easeOutCubic, duration: Motion.d(context, 320))
-        .scaleXY(begin: 0.96, alignment: user ? Alignment.bottomRight : Alignment.bottomLeft);
   }
 }
 
-class _TypingDots extends StatelessWidget {
-  const _TypingDots();
+/// The model's answer: no bubble, full width, with the spark beside it, as in Gemini.
+class _AiReply extends StatelessWidget {
+  const _AiReply({super.key, required this.message});
+  final ChatMessage message;
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final fil = AppScope.of(context).isFil;
+    final sources = [for (final id in message.sources.take(3)) ?KnowledgeBase.instance.byId(id)];
+    final body = ValueListenableBuilder<String>(
+      valueListenable: message.text,
+      builder: (context, text, _) {
+        final waiting = text.isEmpty && message.streaming;
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            AiSpark(size: 22, busy: message.streaming),
+            const SizedBox(width: 10),
+            Text(
+              waiting ? tr(context, 'Thinking…', 'Nag-iisip…') : answeredBy(context, message.byAi),
+              style: TextStyle(fontSize: 12.5, color: cs.onSurfaceVariant, fontWeight: FontWeight.w500),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          AnimatedSize(
+            duration: Motion.d(context, 200),
+            alignment: Alignment.topLeft,
+            curve: Curves.easeOutCubic,
+            child: waiting ? const ThinkingShimmer() : SelectionArea(child: MarkdownText(text)),
+          ),
+          if (!message.streaming && sources.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            SizedBox(
+              height: 74,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: sources.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
+                itemBuilder: (context, i) => _SourceCard(entry: sources[i], fil: fil)
+                    .animate()
+                    .fadeIn(duration: Motion.d(context, 260), delay: (i * 70).ms)
+                    .slideX(begin: 0.1, curve: Curves.easeOutCubic),
+              ),
+            ),
+          ],
+          if (!message.streaming && text.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Row(children: [
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  tooltip: tr(context, 'Copy', 'Kopyahin'),
+                  icon: Icon(Icons.content_copy_rounded, size: 18, color: cs.onSurfaceVariant),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: text.replaceAll('**', '')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr(context, 'Copied', 'Nakopya'))));
+                  },
+                ),
+              ]),
+            ),
+        ]);
+      },
+    );
+    return _enter(context, message, Padding(padding: const EdgeInsets.fromLTRB(16, 10, 16, 6), child: body), user: false);
+  }
+}
+
+/// A cited law, shown as a small card with the topic's icon, like a search result.
+class _SourceCard extends StatelessWidget {
+  const _SourceCard({required this.entry, required this.fil});
+  final KbEntry entry;
+  final bool fil;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final topic = entry.topics.map(topicById).whereType<Topic>().firstOrNull;
+    final color = topic?.color ?? cs.primary;
     return SizedBox(
-      height: 20,
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        for (var i = 0; i < 3; i++)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(color: cs.primary, shape: BoxShape.circle),
-          ).animate(onPlay: (c) => c.repeat()).moveY(begin: 0, end: -5, delay: (i * 140).ms, duration: 380.ms, curve: Curves.easeInOut).then().moveY(begin: -5, end: 0, duration: 380.ms),
-      ]),
+      width: 230,
+      child: Material(
+        color: cs.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => showKbSheet(context, entry),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
+                child: Icon(topic?.icon ?? Icons.gavel_rounded, color: color, size: 22),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(entry.title(fil), maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, height: 1.25)),
+                  const SizedBox(height: 2),
+                  Text(entry.sourceLabel, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
+                ]),
+              ),
+            ]),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -610,78 +762,250 @@ class _QuickActions extends StatelessWidget {
   }
 }
 
+/// Gemini-style input: one rounded surface holding the text field and its
+/// tools. While listening it turns into a live sound wave.
 class _Composer extends StatelessWidget {
-  const _Composer({required this.controller, required this.focus, required this.generating, required this.onSend, required this.onStop, required this.onMic});
+  const _Composer({
+    required this.controller,
+    required this.focus,
+    required this.voice,
+    required this.generating,
+    required this.onSend,
+    required this.onStop,
+    required this.onMic,
+    required this.onVoiceDone,
+  });
   final TextEditingController controller;
   final FocusNode focus;
+  final VoiceCapture voice;
   final bool generating;
   final VoidCallback onSend;
   final VoidCallback onStop;
   final VoidCallback onMic;
+  final VoidCallback onVoiceDone;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final hasText = controller.text.trim().isNotEmpty;
-    final mode = generating ? 'stop' : (hasText ? 'send' : 'mic');
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerLowest,
-        border: Border(top: BorderSide(color: cs.outlineVariant)),
-      ),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        IconButton.filledTonal(
-          tooltip: tr(context, 'Scan a contract', 'Mag-scan ng kontrata'),
-          onPressed: () => openPage(context, const ScanFlowScreen()),
-          icon: const Icon(Icons.document_scanner_rounded),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: TextField(
-            controller: controller,
-            focusNode: focus,
-            minLines: 1,
-            maxLines: 4,
-            textCapitalization: TextCapitalization.sentences,
-            onSubmitted: (_) => onSend(),
-            decoration: InputDecoration(
-              hintText: tr(context, 'Type or talk… e.g. "sahod"', 'Mag-type o magsalita… hal. "sahod"'),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: cs.outline)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: cs.outline)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: cs.primary, width: 1.6)),
+    final dur = Motion.d(context, 260);
+    return ListenableBuilder(
+      listenable: voice,
+      builder: (context, _) {
+        final listening = voice.phase == VoicePhase.recording;
+        final writing = voice.phase == VoicePhase.transcribing;
+        final hasText = controller.text.trim().isNotEmpty;
+        final Widget content;
+        if (listening || writing) {
+          content = Padding(
+            key: const ValueKey('voice'),
+            padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
+            child: Row(children: [
+              IconButton(
+                tooltip: tr(context, 'Cancel', 'Kanselahin'),
+                onPressed: writing ? null : voice.cancel,
+                icon: const Icon(Icons.close_rounded),
+              ),
+              Expanded(
+                child: writing
+                    ? Row(children: [
+                        const AiSpark(size: 18, busy: true),
+                        const SizedBox(width: 10),
+                        Flexible(child: Text(tr(context, 'Writing down what you said…', 'Isinusulat ang sinabi mo…'), style: TextStyle(color: cs.onSurfaceVariant))),
+                      ])
+                    : Column(mainAxisSize: MainAxisSize.min, children: [
+                        VoiceWave(levels: voice.levels, active: true, height: 34, barWidth: 3),
+                        const SizedBox(height: 2),
+                        Text(
+                          tr(context, 'Listening… stops when you pause', 'Nakikinig… hihinto pag tumigil ka'),
+                          style: TextStyle(fontSize: 11.5, color: cs.onSurfaceVariant),
+                        ),
+                      ]),
+              ),
+              const SizedBox(width: 4),
+              if (!writing) const VoiceLangToggle(),
+              const SizedBox(width: 6),
+              _RoundButton(
+                icon: Icons.arrow_upward_rounded,
+                filled: true,
+                tooltip: tr(context, 'Done', 'Tapos na'),
+                onTap: writing ? null : onVoiceDone,
+              ),
+            ]),
+          );
+        } else {
+          content = Column(key: const ValueKey('text'), mainAxisSize: MainAxisSize.min, children: [
+            TextField(
+              controller: controller,
+              focusNode: focus,
+              minLines: 1,
+              maxLines: 5,
+              textCapitalization: TextCapitalization.sentences,
+              onSubmitted: (_) => onSend(),
+              style: const TextStyle(fontSize: 16),
+              decoration: InputDecoration(
+                hintText: tr(context, 'Ask Kontrata', 'Magtanong kay Kontrata'),
+                filled: false,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Pressable(
-          scale: 0.9,
-          onTap: switch (mode) { 'stop' => onStop, 'send' => onSend, _ => onMic },
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              child: Row(children: [
+                _RoundButton(
+                  icon: Icons.add_rounded,
+                  tooltip: tr(context, 'Tools', 'Mga tool'),
+                  onTap: () => _showTools(context),
+                ),
+                const SizedBox(width: 4),
+                _ToolPill(
+                  icon: Icons.document_scanner_outlined,
+                  label: tr(context, 'Compare', 'Ikumpara'),
+                  onTap: () => openPage(context, const ScanFlowScreen()),
+                ),
+                const Spacer(),
+                if (!generating)
+                  _RoundButton(icon: Icons.mic_none_rounded, tooltip: tr(context, 'Speak', 'Magsalita'), onTap: onMic),
+                const SizedBox(width: 4),
+                AnimatedSwitcher(
+                  duration: Motion.d(context, 200),
+                  transitionBuilder: (c, a) => ScaleTransition(scale: a, child: FadeTransition(opacity: a, child: c)),
+                  child: generating
+                      ? _RoundButton(key: const ValueKey('stop'), icon: Icons.stop_rounded, filled: true, tooltip: tr(context, 'Stop', 'Ihinto'), onTap: onStop)
+                      : hasText
+                          ? _RoundButton(key: const ValueKey('send'), icon: Icons.arrow_upward_rounded, filled: true, tooltip: tr(context, 'Send', 'Ipadala'), onTap: onSend)
+                          : const SizedBox(key: ValueKey('none'), width: 0, height: 44),
+                ),
+              ]),
+            ),
+          ]);
+        }
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
           child: AnimatedContainer(
-            duration: Motion.d(context, 220),
-            width: 52,
-            height: 52,
+            duration: dur,
+            curve: Curves.easeOutCubic,
             decoration: BoxDecoration(
-              gradient: mode == 'stop' ? null : KTokens.of(context).hero,
-              color: mode == 'stop' ? KTokens.of(context).danger : null,
-              shape: BoxShape.circle,
-              boxShadow: Motion.reduced(context) ? null : [BoxShadow(color: KTokens.of(context).glow, blurRadius: 16, offset: const Offset(0, 6))],
+              color: cs.surfaceContainer,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: focus.hasFocus || listening ? cs.primary.withValues(alpha: 0.5) : Colors.transparent, width: 1.2),
+              boxShadow: focus.hasFocus || listening ? [BoxShadow(color: KTokens.of(context).glow, blurRadius: 24, offset: const Offset(0, 6))] : null,
             ),
-            child: AnimatedSwitcher(
-              duration: Motion.d(context, 200),
-              transitionBuilder: (c, a) => ScaleTransition(scale: a, child: RotationTransition(turns: Tween(begin: 0.75, end: 1.0).animate(a), child: c)),
-              child: Icon(
-                switch (mode) { 'stop' => Icons.stop_rounded, 'send' => Icons.arrow_upward_rounded, _ => Icons.mic_rounded },
-                key: ValueKey(mode),
-                color: Colors.white,
+            child: AnimatedSize(
+              duration: dur,
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.bottomCenter,
+              child: AnimatedSwitcher(
+                duration: dur,
+                switchInCurve: Curves.easeOutCubic,
+                transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
+                child: content,
               ),
             ),
           ),
-        ),
-      ]),
+        );
+      },
     );
   }
+}
+
+class _RoundButton extends StatelessWidget {
+  const _RoundButton({super.key, required this.icon, required this.tooltip, this.onTap, this.filled = false});
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onTap;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: filled ? (onTap == null ? cs.onSurface.withValues(alpha: 0.12) : cs.primary) : Colors.transparent,
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap == null
+              ? null
+              : () {
+                  HapticFeedback.selectionClick();
+                  onTap!();
+                },
+          child: SizedBox.square(dimension: 44, child: Icon(icon, size: 24, color: filled ? cs.onPrimary : cs.onSurfaceVariant)),
+        ),
+      ),
+    );
+  }
+}
+
+class _ToolPill extends StatelessWidget {
+  const _ToolPill({required this.icon, required this.label, required this.onTap});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Material(
+      color: Colors.transparent,
+      shape: StadiumBorder(side: BorderSide(color: cs.outlineVariant)),
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(icon, size: 17, color: cs.onSurfaceVariant),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500, color: cs.onSurfaceVariant)),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// The "+" menu: every tool in the app, one tap from the chat.
+void _showTools(BuildContext context) {
+  final t = KTokens.of(context);
+  final cs = Theme.of(context).colorScheme;
+  final tools = <(IconData, Color, String, String, Widget)>[
+    (Icons.document_scanner_outlined, cs.primary, tr(context, 'Compare contracts', 'Ikumpara ang kontrata'), tr(context, 'Scan both and see every change', 'I-scan pareho at tingnan ang bawat pagbabago'), const ScanFlowScreen()),
+    (Icons.person_search_outlined, const Color(0xFFE37400), tr(context, 'Check my recruiter', 'I-check ang recruiter'), tr(context, 'Warning signs of illegal recruitment', 'Mga senyales ng illegal recruitment'), const RecruiterCheckScreen()),
+    (Icons.route_outlined, t.success, tr(context, 'My options', 'Mga puwede kong gawin'), tr(context, 'Six steps, quietest first', 'Anim na hakbang, pinakatahimik muna'), const LadderScreen()),
+    (Icons.menu_book_outlined, KColors.purple, tr(context, 'Know your rights', 'Alamin ang karapatan'), tr(context, 'Laws in plain words', 'Mga batas sa simpleng salita'), const RightsScreen()),
+    (Icons.folder_outlined, cs.onSurfaceVariant, tr(context, 'My saved cases', 'Mga naitalang kaso'), tr(context, 'Evidence and reports', 'Ebidensya at mga report'), const CasesScreen()),
+  ];
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (c) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          for (final (icon, color, title, sub, page) in tools)
+            ListTile(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              leading: Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.14), shape: BoxShape.circle),
+                child: Icon(icon, color: color),
+              ),
+              title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: Text(sub),
+              onTap: () {
+                Navigator.pop(c);
+                openPage(context, page);
+              },
+            ),
+        ]),
+      ),
+    ),
+  );
 }
 
 /// Shows one knowledge-base entry with its source.

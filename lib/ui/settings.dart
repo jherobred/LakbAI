@@ -90,7 +90,7 @@ class SettingsScreen extends StatelessWidget {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(m.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                      subtitle: Text('${m.sizeLabel} · ${s.isFil ? m.blurbFil : m.blurbEn}'),
+                      subtitle: Text('${m.id == kBundledModelId && ai.modelBundled ? tr(context, 'Built in', 'Kasama na') : m.sizeLabel} · ${s.isFil ? m.blurbFil : m.blurbEn}'),
                       trailing: s.installedModelId == m.id
                           ? Icon(Icons.check_circle_rounded, color: t.success)
                           : (ai.status == AiStatus.downloading && ai.active?.id == m.id)

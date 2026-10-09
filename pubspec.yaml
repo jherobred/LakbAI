@@ -77,6 +77,8 @@ flutter:
   assets:
     - assets/kb/
     - assets/samples/
+    # Model files packed into the installer (fetched by tool/fetch_models.sh, not in git).
+    - assets/models/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

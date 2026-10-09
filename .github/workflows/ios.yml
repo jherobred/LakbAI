@@ -29,6 +29,10 @@ jobs:
       - name: Flutter packages
         run: flutter pub get
 
+      # Packs the AI and voice models into the app, so it needs no download on first launch.
+      - name: Built-in models
+        run: bash tool/fetch_models.sh
+
       - name: Build iOS (no code signing)
         run: flutter build ios --release --no-codesign
 

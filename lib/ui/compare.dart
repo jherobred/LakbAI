@@ -8,6 +8,7 @@ import '../contract/contract.dart';
 import '../core/app_state.dart';
 import '../knowledge/kb.dart';
 import '../theme.dart';
+import 'ai_widgets.dart';
 import 'chat.dart';
 import 'ladder.dart';
 import 'report.dart';
@@ -44,12 +45,15 @@ class _CompareScreenState extends State<CompareScreen> {
     final ai = AiService.instance;
     try {
       if (ai.ready && d.isNotEmpty) {
+        // Keep the raw stream and show a cleaned copy, so line breaks between tokens survive.
+        final raw = StringBuffer();
         await for (final t in ai.ask(
           system: systemPrompt(fil: fil),
           prompt: explainChangesPrompt(diffSummary: diffSummaryForModel(d), fil: fil),
-          maxOutputTokens: 300,
+          maxOutputTokens: 260,
         )) {
-          setState(() => _explanation = cleanModelText(_explanation + t));
+          raw.write(t);
+          setState(() => _explanation = cleanModelText(raw.toString()));
         }
       }
       if (_explanation.trim().isEmpty) {
@@ -123,6 +127,10 @@ class _CompareScreenState extends State<CompareScreen> {
               ),
             ]),
           ).animate().fadeIn(duration: d).scaleXY(begin: 0.95, curve: Curves.easeOutBack),
+          if (c.discrepancies.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _SeverityStrip(discrepancies: c.discrepancies, colorOf: (s) => _sev(context, s)).animate().fadeIn(duration: d, delay: 100.ms),
+          ],
           const SizedBox(height: 14),
           if (c.discrepancies.isEmpty)
             KCard(
@@ -157,7 +165,7 @@ class _CompareScreenState extends State<CompareScreen> {
                             : const Icon(Icons.record_voice_over_rounded),
                         label: Text(tr(context, 'Explain in simple words', 'Ipaliwanag sa simpleng salita')),
                       )
-                    : Text(_explanation, style: const TextStyle(fontSize: 15.5, height: 1.45)),
+                    : MarkdownText(_explanation),
               ),
               if (_explanation.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -208,7 +216,7 @@ class _DiffCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: Container(
-        decoration: BoxDecoration(color: cs.surface, border: Border.all(color: cs.outlineVariant), borderRadius: BorderRadius.circular(22)),
+        decoration: BoxDecoration(color: cs.surfaceContainer, borderRadius: BorderRadius.circular(22)),
         child: IntrinsicHeight(
           child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(width: 6, color: color),
@@ -228,6 +236,10 @@ class _DiffCard extends StatelessWidget {
                     ),
                     Expanded(child: _Val(label: tr(context, 'New', 'Bago'), value: d.after, color: color)),
                   ]),
+                  if ((_firstNumber(d.before), _firstNumber(d.after)) case (final a?, final b?) when a > 0 && b > 0 && a != b) ...[
+                    const SizedBox(height: 12),
+                    _NumberBars(before: a, after: b, color: color),
+                  ],
                   const SizedBox(height: 10),
                   Text(d.note(fil), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13.5, height: 1.4)),
                   if (d.kbIds.isNotEmpty) ...[
@@ -267,6 +279,94 @@ class _Val extends StatelessWidget {
         Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: color)),
         const SizedBox(height: 2),
         Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800), maxLines: 2, overflow: TextOverflow.ellipsis),
+      ]),
+    );
+  }
+}
+
+double? _firstNumber(String s) {
+  final m = RegExp(r'\d[\d,]*(?:\.\d+)?').firstMatch(s);
+  return m == null ? null : double.tryParse(m.group(0)!.replaceAll(',', ''));
+}
+
+/// Verified value against the new one as two bars, so a cut is visible at a glance.
+class _NumberBars extends StatelessWidget {
+  const _NumberBars({required this.before, required this.after, required this.color});
+  final double before;
+  final double after;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final max = before > after ? before : after;
+    final pct = ((after - before) / before * 100).round();
+    Widget bar(String label, double v, Color c, int delay) => Row(children: [
+          SizedBox(width: 64, child: Text(label, style: TextStyle(fontSize: 11.5, color: cs.onSurfaceVariant))),
+          Expanded(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: v / max),
+              duration: Motion.d(context, 900 + delay),
+              curve: Curves.easeOutCubic,
+              builder: (context, f, _) => Align(
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: f.clamp(0.02, 1.0),
+                  child: Container(height: 12, decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(99))),
+                ),
+              ),
+            ),
+          ),
+        ]);
+    return Column(children: [
+      bar(tr(context, 'Verified', 'Na-verify'), before, KTokens.of(context).success, 0),
+      const SizedBox(height: 6),
+      bar(tr(context, 'New', 'Bago'), after, color, 200),
+      Align(
+        alignment: Alignment.centerRight,
+        child: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text('${pct > 0 ? '+' : ''}$pct%', style: TextStyle(fontWeight: FontWeight.w700, color: color, fontSize: 12.5)),
+        ),
+      ),
+    ]);
+  }
+}
+
+/// One segmented bar showing how many changes are serious, minor, neutral or better.
+class _SeverityStrip extends StatelessWidget {
+  const _SeverityStrip({required this.discrepancies, required this.colorOf});
+  final List<Discrepancy> discrepancies;
+  final Color Function(Severity) colorOf;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final counts = {for (final s in Severity.values) s: discrepancies.where((d) => d.severity == s).length}..removeWhere((_, n) => n == 0);
+    String label(Severity s) => switch (s) {
+          Severity.high => tr(context, 'Serious', 'Malubha'),
+          Severity.medium => tr(context, 'Check', 'Suriin'),
+          Severity.info => tr(context, 'Info', 'Impormasyon'),
+          Severity.better => tr(context, 'Better', 'Mas maganda'),
+        };
+    return KCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(99),
+          child: Row(children: [
+            for (final e in counts.entries) Expanded(flex: e.value, child: Container(height: 10, color: colorOf(e.key))),
+          ]),
+        ),
+        const SizedBox(height: 10),
+        Wrap(spacing: 14, runSpacing: 6, children: [
+          for (final e in counts.entries)
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Container(width: 10, height: 10, decoration: BoxDecoration(color: colorOf(e.key), shape: BoxShape.circle)),
+              const SizedBox(width: 6),
+              Text('${e.value} ${label(e.key)}', style: TextStyle(fontSize: 12.5, color: cs.onSurfaceVariant, fontWeight: FontWeight.w500)),
+            ]),
+        ]),
       ]),
     );
   }

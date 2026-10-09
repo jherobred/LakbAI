@@ -11,7 +11,7 @@ Built for AppBuildersPH Hackathon 2026 (theme: Local AI), 9–10 October 2026.
 | **Android 11+** (64-bit phones) | [**kontrata-android.apk**](https://github.com/jherobred/kontrata/releases/latest/download/kontrata-android.apk) | Open the file on your phone, allow **Install unknown apps** for your browser or Files app, then tap **Install**. If Play Protect warns about an unknown developer, tap **Install anyway**. This is a hackathon build. |
 | **iOS 16+** | [**kontrata-ios-unsigned.ipa**](https://github.com/jherobred/kontrata/releases/latest/download/kontrata-ios-unsigned.ipa) | Apple does not allow installing unsigned apps directly. Re-sign it with your Apple ID using [AltStore](https://altstore.io) or [Sideloadly](https://sideloadly.io), or build from source in Xcode (see [iOS](#ios)). |
 
-All builds are on the [Releases page](https://github.com/jherobred/kontrata/releases). After installing, open LakbAI once on Wi-Fi to download the AI model. After that it works in airplane mode.
+All builds are on the [Releases page](https://github.com/jherobred/kontrata/releases). The AI model (Qwen3 0.6B) and the voice model (Whisper base) are inside the installer, so LakbAI works in airplane mode from the first launch with nothing else to download.
 
 ## The problem
 
@@ -40,7 +40,8 @@ LakbAI covers three gaps:
 | Clause comparison and minimum-standard checks | Yes: rule engine in Dart | No |
 | Legal knowledge search | Yes: 33-entry cited knowledge base, BM25 search | No |
 | PDF incident report | Yes: generated on the phone | No |
-| Model downloads | — | **Once**, from Hugging Face |
+| Built-in models (Qwen3 0.6B, Whisper base) | Yes, inside the installer | No |
+| Optional bigger models (Qwen3 0.6B full, Gemma 4 E2B) | — | **Once**, from Hugging Face |
 | Calling hotlines (1348, 1343) | — | Mobile signal |
 | Sharing the report | — | Only when the worker chooses |
 
@@ -65,10 +66,11 @@ Requirements: Flutter 3.47.2 (Dart 3.13), Android SDK 36, and an **Android 11+ a
 
 ```bash
 flutter pub get
+bash tool/fetch_models.sh   # packs the AI and voice models into the installer (~420 MB, once)
 flutter run --release
 ```
 
-On first launch, go through onboarding and tap the recommended model on Wi-Fi (345 MB to 2.6 GB). Turn on airplane mode afterwards: everything keeps working. To try the comparison without paper, open **Compare contracts → Try with sample contracts**.
+The model files are not in git (GitHub's 100 MB limit). Without `tool/fetch_models.sh` the app still builds and offers a one-time download on first launch instead. Airplane mode works from the first launch. To try the comparison without paper, open **Compare contracts → Try with sample contracts**.
 
 Tests for the contract reader: `flutter test`.
 
@@ -91,7 +93,7 @@ The codebase targets iOS 16+, and a Mac with Xcode is needed:
 
 **Frameworks and libraries:** Flutter; flutter_edge_ai, flutter_edge_ai_litertlm and flutter_edge_ai_speech (LiteRT-LM runtime); google_mlkit_text_recognition; camera; image_picker; record; pdf; share_plus; flutter_animate; animations; shared_preferences; path_provider; crypto; url_launcher; file_picker.
 
-**APIs and cloud services:** Hugging Face is used only to download model files once. There are no other cloud services, no analytics, no accounts and no telemetry.
+**APIs and cloud services:** Hugging Face is used only to fetch model files at build time, and for the optional bigger models. There are no other cloud services, no analytics, no accounts and no telemetry.
 
 **Existing code and assets**
 - Flutter's app template.

@@ -31,6 +31,12 @@ android {
         ndk { abiFilters += listOf("arm64-v8a") }
     }
 
+    // The built-in model files barely compress; storing them as-is makes the
+    // first-launch unpack a plain copy.
+    androidResources {
+        noCompress += listOf("litertlm", "tflite")
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.

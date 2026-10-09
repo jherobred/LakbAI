@@ -1,21 +1,29 @@
 import '../knowledge/kb.dart';
 
-/// Keeps the small on-device model grounded in the knowledge base and gentle in tone.
+/// Kept short on purpose: every token here is re-read by the small on-device
+/// model before each reply, so a shorter prompt means a faster first word.
 String systemPrompt({required bool fil}) => '''
-You are Kontrata, a calm helper for Overseas Filipino Workers (OFWs). You run fully offline on the worker's phone.
-Rules:
-- Reply in ${fil ? 'simple Filipino (Taglish is fine)' : 'simple English'}. Short sentences. At most 120 words.
-- Use ONLY the facts in CONTEXT. If CONTEXT does not answer it, say you are not sure and suggest calling 1348 or asking the Migrant Workers Office (MWO).
-- Never invent laws, numbers, phone numbers or deadlines.
-- Never push the worker to confront the employer. Offer the safest option first. Keeping evidence quietly is always a valid choice.
-- If they mention danger, abuse or trafficking, put safety first: 1343 (trafficking) or 1348 (DMW/OWWA 24/7).
-- Use short bullet points for steps. End with one line naming the law or source you used.
-- You are not a lawyer. Do not promise outcomes.''';
+You are Kontrata, a friendly offline helper for Overseas Filipino Workers (OFWs).
+Answer in ${fil ? 'simple Filipino (Taglish is fine)' : 'simple English'}.
+Format:
+1. One short sentence that answers directly.
+2. Up to 3 bullet points ("- ") with what to do or know. Use **bold** for key numbers.
+3. A last line: "Source: <law>".
+Use only facts from CONTEXT. Never invent laws, numbers or phone numbers. If CONTEXT does not cover it, say so and suggest calling 1348.
+Never push the worker to confront the employer. If they are in danger, tell them to call 1343 or 1348 first.''';
+
+/// Long entries slow the model down; the first sentences carry the facts.
+String _clip(String s, int max) {
+  if (s.length <= max) return s;
+  final cut = s.substring(0, max);
+  final end = cut.lastIndexOf('. ');
+  return end > max ~/ 2 ? cut.substring(0, end + 1) : '$cut…';
+}
 
 String buildContext(List<KbEntry> entries, {required bool fil}) {
   final b = StringBuffer('CONTEXT:\n');
   for (final e in entries) {
-    b.writeln('- ${e.titleEn}: ${e.bodyEn} (Source: ${e.sourceLabel})');
+    b.writeln('- ${e.titleEn}: ${_clip(e.bodyEn, 320)} (Source: ${e.sourceLabel})');
   }
   return b.toString();
 }
@@ -23,9 +31,9 @@ String buildContext(List<KbEntry> entries, {required bool fil}) {
 String buildPrompt({required String question, required List<KbEntry> context, required bool fil, String? lastExchange}) {
   final b = StringBuffer(buildContext(context, fil: fil));
   if (lastExchange != null && lastExchange.isNotEmpty) {
-    b.writeln('\nEARLIER IN THIS CHAT:\n$lastExchange');
+    b.writeln('\nEARLIER:\n$lastExchange');
   }
-  b.writeln('\nWORKER ASKS: $question');
+  b.writeln('\nQUESTION: $question');
   return b.toString();
 }
 
@@ -34,15 +42,16 @@ String buildPrompt({required String question, required List<KbEntry> context, re
 String extractiveAnswer(List<KbEntry> entries, {required bool fil}) {
   if (entries.isEmpty) {
     return fil
-        ? 'Wala akong eksaktong sagot dito. Puwede kang tumawag sa 1348 (DMW/OWWA, 24/7) o lumapit sa Migrant Workers Office sa embahada.'
-        : "I don't have an exact answer for that. You can call 1348 (DMW/OWWA, 24/7) or visit the Migrant Workers Office at the embassy.";
+        ? 'Wala akong eksaktong sagot dito. Puwede kang tumawag sa **1348** (DMW/OWWA, 24/7) o lumapit sa Migrant Workers Office sa embahada.'
+        : "I don't have an exact answer for that. You can call **1348** (DMW/OWWA, 24/7) or visit the Migrant Workers Office at the embassy.";
   }
-  final b = StringBuffer(fil ? 'Ito ang alam ko:\n\n' : "Here's what I know:\n\n");
+  final b = StringBuffer();
   for (final e in entries.take(2)) {
-    b.writeln('• ${e.title(fil)}');
+    b.writeln('**${e.title(fil)}**');
     b.writeln(e.body(fil));
     b.writeln();
   }
+  b.write('Source: ${entries.first.sourceLabel}');
   return b.toString().trim();
 }
 
@@ -55,7 +64,7 @@ CONTEXT:
 CHANGES FOUND BETWEEN THE VERIFIED CONTRACT AND THE NEW ONE:
 $diffSummary
 
-Explain to the worker in ${fil ? 'simple Filipino' : 'simple English'}, in under 110 words, what these changes mean for them. Be calm. Do not tell them to confront anyone. End by saying they can keep this evidence and decide later.''';
+Explain to the worker in ${fil ? 'simple Filipino' : 'simple English'}, in under 110 words, what these changes mean for them. Start with one plain sentence, then short "- " bullets. Be calm. Do not tell them to confront anyone. End by saying they can keep this evidence and decide later.''';
 
 String statementPrompt({required String rawText, required bool fil}) => '''
 Rewrite the worker's account below as a clear, first-person statement for an incident report, in ${fil ? 'Filipino' : 'English'}.
@@ -63,3 +72,19 @@ Keep every fact, date, name and number exactly as given. Do not add facts. Use s
 
 ACCOUNT:
 $rawText''';
+
+/// Small Tagalog function words that rarely appear in English sentences.
+const _filWords = {
+  'ang', 'ng', 'mga', 'ko', 'ako', 'ba', 'po', 'sa', 'na', 'ay', 'hindi', 'paano', 'ano', 'bakit', 'kailan',
+  'saan', 'sino', 'yung', 'kasi', 'pero', 'naman', 'lang', 'akin', 'aking', 'niya', 'nila', 'namin', 'kami',
+  'tayo', 'siya', 'ito', 'iyan', 'dito', 'doon', 'wala', 'meron', 'pwede', 'puwede', 'dapat', 'kung',
+};
+
+/// Replies in the language the worker actually wrote in, so a Filipino
+/// question gets a Filipino answer even when the app is set to English.
+bool looksFilipino(String text, {required bool fallback}) {
+  final words = text.toLowerCase().split(RegExp(r'[^a-zñ]+')).where((w) => w.isNotEmpty).toList();
+  if (words.length < 2) return fallback;
+  final hits = words.where(_filWords.contains).length;
+  return hits / words.length >= 0.15 || (hits >= 2);
+}

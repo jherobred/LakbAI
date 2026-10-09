@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_edge_ai/flutter_edge_ai.dart';
 import 'package:flutter_edge_ai_litertlm/flutter_edge_ai_litertlm.dart';
 import 'package:flutter_edge_ai_speech/flutter_edge_ai_speech.dart';
@@ -36,13 +37,30 @@ class ModelOption {
 }
 
 class VoiceOption {
-  const VoiceOption({required this.id, required this.name, required this.modelUrl, required this.tokenizerUrl, required this.sizeMb});
+  const VoiceOption({
+    required this.id,
+    required this.name,
+    required this.modelUrl,
+    required this.tokenizerUrl,
+    required this.sizeMb,
+    this.modelAsset,
+    this.tokenizerAsset,
+  });
   final String id;
   final String name;
   final String modelUrl;
   final String tokenizerUrl;
   final int sizeMb;
+
+  /// Set when the installer ships this voice model (see tool/fetch_models.sh).
+  final String? modelAsset;
+  final String? tokenizerAsset;
 }
+
+/// Model files packed into the installer by tool/fetch_models.sh. Builds made
+/// without them fall back to the one-time download.
+const kBundledModelAsset = 'assets/models/Qwen3-0.6B_dynamic_wi4b32_afp32.litertlm';
+const kBundledModelId = 'qwen3-0.6b-lite';
 
 /// All models are Apache-2.0 and ungated on Hugging Face, so no token is needed.
 const kModels = <ModelOption>[
@@ -93,11 +111,16 @@ const kVoices = <VoiceOption>[
     modelUrl: 'https://huggingface.co/litert-community/whisper-base/resolve/main/whisper_base_30s_i8.tflite',
     tokenizerUrl: 'https://huggingface.co/openai/whisper-base/resolve/main/tokenizer.json',
     sizeMb: 80,
+    modelAsset: 'assets/models/whisper_base_30s_i8.tflite',
+    tokenizerAsset: 'assets/models/whisper_base_tokenizer.json',
   ),
 ];
 
 ModelOption recommendedModel(DeviceTier tier) => kModels.firstWhere((m) => m.tier == tier);
-VoiceOption recommendedVoice(DeviceTier tier) => tier == DeviceTier.low ? kVoices.first : kVoices.last;
+
+/// The built-in voice when the installer has it, otherwise the best download for the phone.
+VoiceOption recommendedVoice(DeviceTier tier) =>
+    AiService.instance.voiceBundled ? kVoices.last : (tier == DeviceTier.low ? kVoices.first : kVoices.last);
 ModelOption? modelById(String? id) => kModels.where((m) => m.id == id).firstOrNull;
 
 enum AiStatus { notInstalled, downloading, loading, ready, error }
@@ -127,8 +150,22 @@ class AiService extends ChangeNotifier {
 
   bool get ready => status == AiStatus.ready;
 
+  /// True when the installer carries the model files, so nothing has to be downloaded.
+  bool modelBundled = false;
+  bool voiceBundled = false;
+
+  Future<void> _detectBundled() async {
+    try {
+      final assets = (await AssetManifest.loadFromAssetBundle(rootBundle)).listAssets().toSet();
+      modelBundled = assets.contains(kBundledModelAsset);
+      final v = kVoices.last;
+      voiceBundled = assets.contains(v.modelAsset) && assets.contains(v.tokenizerAsset);
+    } catch (_) {}
+  }
+
   Future<void> init(AppState app) async {
     _app = app;
+    await _detectBundled();
     try {
       await FlutterEdgeAi.initialize(
         inferenceEngines: const [LiteRtLmEngine()],
@@ -140,11 +177,32 @@ class AiService extends ChangeNotifier {
     voiceReady = app.installedVoiceId != null;
     final id = app.installedModelId;
     if (id != null) {
-      active = modelById(id) ?? (id == 'imported' ? null : null);
+      active = modelById(id);
       // Load in the background so the first screen is never blocked.
-      unawaited(_activateInstalled());
+      unawaited(_activateInstalled().then((_) => _setUpBundledVoice()));
+    } else if (modelBundled) {
+      // First launch of an installer that carries the model: unpack it, no download.
+      unawaited(install(modelById(kBundledModelId)!).then((_) => _setUpBundledVoice()));
+    } else {
+      unawaited(_setUpBundledVoice());
     }
     notifyListeners();
+  }
+
+  Future<void> _setUpBundledVoice() async {
+    if (!voiceReady && voiceBundled) await installVoice(kVoices.last);
+    // Open the recognizer early so the first voice message is not slowed by loading it.
+    if (voiceReady) {
+      try {
+        _stt ??= await FlutterEdgeAi.getActiveStt();
+      } catch (_) {}
+    }
+  }
+
+  /// The install builder for [m]: the copy inside the installer when there is one.
+  InferenceInstallationBuilder _source(ModelOption m) {
+    final b = FlutterEdgeAi.installModel(modelType: m.type, fileType: ModelFileType.litertlm);
+    return m.id == kBundledModelId && modelBundled ? b.fromAsset(kBundledModelAsset) : b.fromNetwork(m.url);
   }
 
   Future<void> _activateInstalled() async {
@@ -172,7 +230,7 @@ class AiService extends ChangeNotifier {
           notifyListeners();
           return;
         }
-        await FlutterEdgeAi.installModel(modelType: m.type, fileType: ModelFileType.litertlm).fromNetwork(m.url).install();
+        await _source(m).install();
       }
       await _load();
     } catch (e) {
@@ -190,9 +248,11 @@ class AiService extends ChangeNotifier {
     error = null;
     active = m;
     notifyListeners();
+    // Unpacking the built-in model takes seconds and needs no network, so it shows as loading.
+    if (m.id == kBundledModelId && modelBundled) status = AiStatus.loading;
+    notifyListeners();
     try {
-      await FlutterEdgeAi.installModel(modelType: m.type, fileType: ModelFileType.litertlm)
-          .fromNetwork(m.url)
+      await _source(m)
           .withCancelToken(_cancel!)
           .withProgress((p) {
             progress = p;
@@ -243,6 +303,15 @@ class AiService extends ChangeNotifier {
     );
     status = AiStatus.ready;
     notifyListeners();
+    unawaited(_warmUp());
+  }
+
+  /// Runs one tiny reply right after loading, so the one-time engine start-up
+  /// cost is paid before the worker asks anything.
+  Future<void> _warmUp() async {
+    try {
+      await for (final _ in ask(system: 'Reply with OK.', prompt: 'Hi', maxOutputTokens: 2)) {}
+    } catch (_) {}
   }
 
   /// Streams a reply token by token. Each question gets a fresh chat so a
@@ -320,9 +389,13 @@ class AiService extends ChangeNotifier {
     voiceProgress = 0;
     notifyListeners();
     try {
-      await FlutterEdgeAi.installStt()
-          .modelFromNetwork(v.modelUrl)
-          .tokenizerFromNetwork(v.tokenizerUrl)
+      final b = FlutterEdgeAi.installStt();
+      if (voiceBundled && v.modelAsset != null) {
+        b.modelFromAsset(v.modelAsset!).tokenizerFromAsset(v.tokenizerAsset!);
+      } else {
+        b.modelFromNetwork(v.modelUrl).tokenizerFromNetwork(v.tokenizerUrl);
+      }
+      await b
           .ofType(SttModelType.whisper)
           .withModelProgress((p) {
             voiceProgress = p;
@@ -341,9 +414,15 @@ class AiService extends ChangeNotifier {
 
   /// [pcm] is 16 kHz mono 16-bit PCM. [language] is a Whisper code: 'tl' or 'en'.
   Future<String> transcribe(Uint8List pcm, String language) async {
-    _stt ??= await FlutterEdgeAi.getActiveStt(language: language);
-    final text = await _stt!.transcribe(pcm, language: language);
-    return text.trim();
+    try {
+      _stt ??= await FlutterEdgeAi.getActiveStt();
+    } on StateError {
+      // The recognizer was forgotten (for example after an update): set it up again.
+      voiceReady = false;
+      await _setUpBundledVoice();
+      _stt ??= await FlutterEdgeAi.getActiveStt();
+    }
+    return cleanTranscript(await _stt!.transcribe(pcm, language: language));
   }
 }
 
@@ -353,4 +432,13 @@ String cleanModelText(String s) {
   t = t.replaceAll(RegExp(r'<\|[^|]*\|>'), '');
   t = t.replaceAll(RegExp(r'</?(start_of_turn|end_of_turn|eos|bos)>'), '');
   return t.trim();
+}
+
+/// Whisper writes tags like [BLANK_AUDIO] or (music) for silence and noise,
+/// and sometimes stock phrases when nothing was said. Drop those.
+String cleanTranscript(String s) {
+  var t = s.replaceAll(RegExp(r'\[[^\]]*\]|\([^)]*\)|<\|[^|]*\|>'), ' ');
+  t = t.replaceAll(RegExp(r'\s+'), ' ').trim();
+  const noise = {'thank you.', 'thanks for watching!', 'thank you for watching.', 'you', 'salamat po.', '.'};
+  return noise.contains(t.toLowerCase()) ? '' : t;
 }
