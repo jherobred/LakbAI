@@ -1,6 +1,6 @@
-# Kontrata
+# LakbAI
 
-**An offline contract checker for Overseas Filipino Workers.** Kontrata compares the contract the DMW verified with the one a worker is handed abroad, explains every change in Filipino or English, and turns it into a formal incident report. The language model, speech recognition and text recognition all run on the phone.
+**An offline contract checker for Overseas Filipino Workers.** LakbAI compares the contract the DMW verified with the one a worker is handed abroad, explains every change in Filipino or English, and turns it into a formal incident report. The language model, speech recognition and text recognition all run on the phone.
 
 Built for AppBuildersPH Hackathon 2026 (theme: Local AI), 9–10 October 2026.
 
@@ -11,13 +11,13 @@ Built for AppBuildersPH Hackathon 2026 (theme: Local AI), 9–10 October 2026.
 | **Android 11+** (64-bit phones) | [**kontrata-android.apk**](https://github.com/jherobred/kontrata/releases/latest/download/kontrata-android.apk) | Open the file on your phone, allow **Install unknown apps** for your browser or Files app, then tap **Install**. If Play Protect warns about an unknown developer, tap **Install anyway**. This is a hackathon build. |
 | **iOS 16+** | [**kontrata-ios-unsigned.ipa**](https://github.com/jherobred/kontrata/releases/latest/download/kontrata-ios-unsigned.ipa) | Apple does not allow installing unsigned apps directly. Re-sign it with your Apple ID using [AltStore](https://altstore.io) or [Sideloadly](https://sideloadly.io), or build from source in Xcode (see [iOS](#ios)). |
 
-All builds are on the [Releases page](https://github.com/jherobred/kontrata/releases). After installing, open Kontrata once on Wi-Fi to download the AI model. After that it works in airplane mode.
+All builds are on the [Releases page](https://github.com/jherobred/kontrata/releases). After installing, open LakbAI once on Wi-Fi to download the AI model. After that it works in airplane mode.
 
 ## The problem
 
 Contract substitution means swapping a DMW-verified contract for a worse one, usually right before departure or after arrival. It is illegal under Labor Code Art. 34(i) and RA 8042 Sec. 6, but workers sign under pressure without spotting lower pay, fewer rest days or a different job. Many never act because they are abroad, afraid, and have no proof.
 
-Kontrata covers three gaps:
+LakbAI covers three gaps:
 
 1. **Noticing.** It scans both contracts and flags every clause that changed against the worker.
 2. **Proof.** Photos are fingerprinted (SHA-256) and saved privately with a timestamped record.
@@ -25,7 +25,7 @@ Kontrata covers three gaps:
 
 ## Why this product benefits from running AI locally
 
-- **The moment of substitution is offline.** It happens at an agency desk or on arrival abroad, where the worker may have no local SIM, no data and no Wi-Fi. Kontrata works in airplane mode.
+- **The moment of substitution is offline.** It happens at an agency desk or on arrival abroad, where the worker may have no local SIM, no data and no Wi-Fi. LakbAI works in airplane mode.
 - **The phone may be watched.** Employers sometimes check or take workers' phones. Nothing is uploaded, so there is no cloud account, chat log or server copy to find. The app has a PIN lock and a one-tap quick exit.
 - **The documents are sensitive.** Contracts carry passport numbers, employer names and salaries. Sending them to a cloud AI would hand that data to a third party.
 - **It is free to use.** On-device inference costs nothing per scan or question, which matters for low-income workers.
@@ -106,8 +106,8 @@ The codebase targets iOS 16+, and a Mac with Xcode is needed:
 - Legal information, not legal advice. Laws and DMW rules change, so confirm with the MWO, DMW or a lawyer.
 - Text recognition reads Latin-script (English) contracts. Arabic or Chinese-only pages are not read.
 - Small on-device models can be wrong. Answers are grounded in a cited knowledge base, and all numbers in comparisons come from rules.
-- The DMW US$500 domestic-worker minimum (2025) was introduced with a transition period, so Kontrata reports it as "check with the MWO" rather than a violation.
-- Kontrata cannot verify agency licenses offline. It links to the DMW list.
+- The DMW US$500 domestic-worker minimum (2025) was introduced with a transition period, so LakbAI reports it as "check with the MWO" rather than a violation.
+- LakbAI cannot verify agency licenses offline. It links to the DMW list.
 
 ## Team
 
