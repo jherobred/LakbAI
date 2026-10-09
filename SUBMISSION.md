@@ -18,7 +18,7 @@ Paste each answer into the matching field. Deadline: 10:00 AM, 10 October 2026.
 
 **X / LinkedIn video URL:** _paste the post link here_.
 
-**What runs locally:** the language model (Qwen3 0.6B built in, Gemma 4 E2B optional, via LiteRT-LM), speech-to-text (Whisper base built in, Whisper tiny optional), contract text recognition (Google ML Kit, bundled model), clause comparison and minimum-standard checks, legal knowledge search over a 46-entry cited knowledge base, and PDF incident report generation.
+**What runs locally:** the language model (Qwen3 0.6B built in, Gemma 4 E2B optional, via LiteRT-LM), speech-to-text (Whisper base built in, Whisper tiny optional), contract text recognition (Google ML Kit, bundled model), clause comparison and minimum-standard checks, legal knowledge search over a 47-entry cited knowledge base, and PDF incident report generation.
 
 **What requires internet:** nothing for the core app, since the AI and voice models ship inside the installer and it works in airplane mode from the first launch. Optional bigger models download once from Hugging Face. Calling hotlines needs mobile signal, and sharing a report needs a connection only when the worker chooses to share.
 

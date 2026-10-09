@@ -38,7 +38,7 @@ LakbAI covers three gaps:
 | Voice input (speech-to-text) | Yes: Whisper tiny/base via LiteRT | No |
 | Contract reading (OCR) | Yes: Google ML Kit text recognition (bundled model) | No |
 | Clause comparison and minimum-standard checks | Yes: rule engine in Dart | No |
-| Legal knowledge search | Yes: 46-entry cited knowledge base, BM25 search with Taglish search terms | No |
+| Legal knowledge search | Yes: 47-entry cited knowledge base, BM25 search with Taglish search terms | No |
 | PDF incident report | Yes: generated on the phone | No |
 | Built-in models (Qwen3 0.6B, Whisper base) | Yes, inside the installer | No |
 | Optional bigger models (Qwen3 0.6B full, Gemma 4 E2B) | — | **Once**, from Hugging Face |

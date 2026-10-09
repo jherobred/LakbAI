@@ -40,6 +40,8 @@ const _cases = <String, List<String>>{
   'minimum wage for helpers in hong kong': ['country_hk_wage'],
   'baka tingnan ng amo ko ang cellphone ko': ['phone_privacy'],
   'contract on musaned in saudi': ['country_ksa_musaned'],
+  'kinuha ng amo ang passport ko dito sa riyadh': ['country_ksa_domestic', 'passport_abroad'],
+  'can my employer in jeddah keep my passport': ['country_ksa_domestic', 'passport_abroad'],
   'rest day sa singapore': ['country_sg_rest'],
   'nakakulong ako sa bahay ng amo': ['abuse_help', 'hotline_1343', 'trafficking'],
   'ano ang dapat kong ikumpara sa dalawang kontrata': ['what_to_compare'],

@@ -356,6 +356,17 @@
       "keywords": ["musaned", "saudi", "ksa", "riyadh", "jeddah", "e-contract", "iqama"]
     },
     {
+      "id": "country_ksa_domestic",
+      "kind": "country",
+      "topics": ["country_ksa", "passport", "hours"],
+      "title_en": "Saudi Arabia: your employer may not keep your passport",
+      "title_fil": "Saudi Arabia: bawal hawakan ng amo ang passport mo",
+      "body_en": "Saudi Arabia's Domestic Workers Regulation (Ministerial Decision No. 40676, in force since 3 October 2024) bans employers from confiscating a domestic worker's passport and sets maximum working hours. Your contract is recorded on Musaned. If your passport is taken, write down the date and ask the Migrant Workers Office in Riyadh, Jeddah or Al Khobar for help.",
+      "body_fil": "Sa Domestic Workers Regulation ng Saudi Arabia (Ministerial Decision No. 40676, umiiral mula 3 Oktubre 2024), bawal kumpiskahin ng amo ang passport ng kasambahay at may limitasyon ang oras ng trabaho. Nakatala ang kontrata mo sa Musaned. Kung kinuha ang passport mo, isulat ang petsa at humingi ng tulong sa Migrant Workers Office sa Riyadh, Jeddah o Al Khobar.",
+      "source": {"label": "Saudi Ministerial Decision No. 40676 (Domestic Workers Regulation, 2023)", "url": "https://www.migrant-rights.org/2023/10/an-overview-of-saudis-new-domestic-workers-law/"},
+      "keywords": ["khobar", "al khobar", "kafeel", "sponsor", "iqama", "musaned", "kinuha", "kinumpiska", "hawak ng amo", "passport", "pasaporte", "oras ng trabaho"]
+    },
+    {
       "id": "what_to_compare",
       "kind": "process",
       "topics": ["contract", "salary", "hours", "rest_day", "leave"],
@@ -463,7 +474,7 @@
       "body_en": "Under UAE Decree-Law No. 9 of 2022, a domestic worker gets one paid day off a week and at least 12 hours of rest a day, including 8 hours in a row. Paid annual leave is at least 30 days a year, with a ticket home every 2 years. You may keep your own passport and ID. The employer may hold them only for visa processing and must give them back.",
       "body_fil": "Sa UAE Decree-Law No. 9 of 2022, may isang bayad na day off kada linggo ang kasambahay at hindi bababa sa 12 oras na pahinga kada araw, kasama ang 8 oras na tuloy-tuloy. May hindi bababa sa 30 araw na bayad na bakasyon kada taon, at ticket pauwi tuwing 2 taon. Ikaw ang may hawak ng passport at ID mo. Puwede lang itong hawakan ng amo habang inaayos ang visa, at dapat itong ibalik.",
       "source": {"label": "UAE Federal Decree-Law No. 9 of 2022 on Domestic Workers", "url": "https://uaelegislation.gov.ae/en/legislations/1593"},
-      "keywords": ["uae", "dubai", "abu dhabi", "sharjah", "emirates", "sponsor", "kafeel", "mohre", "tadbeer", "keeps my passport"]
+      "keywords": ["sponsor", "kafeel", "mohre", "tadbeer", "keeps my passport"]
     },
     {
       "id": "country_kw_domestic",
@@ -474,7 +485,7 @@
       "body_en": "Kuwait's Domestic Workers Law No. 68 of 2015 caps work at 12 hours a day with rest breaks, and gives one paid day off a week and paid annual leave. The employer may not keep your passport or civil ID without your agreement. When the contract ends you get one month's pay for each year of work.",
       "body_fil": "Sa Domestic Workers Law No. 68 of 2015 ng Kuwait, hanggang 12 oras lang ang trabaho kada araw na may pahinga, may isang bayad na day off kada linggo, at may bayad na bakasyon kada taon. Hindi puwedeng hawakan ng amo ang passport o civil ID mo nang walang pahintulot mo. Pagtapos ng kontrata, may isang buwang sahod ka para sa bawat taon ng trabaho.",
       "source": {"label": "Kuwait Law No. 68 of 2015 on Domestic Workers", "url": "https://gulfmigration.grc.net/kuwait-ministerial-decree-no-68-of-2015regarding-domestic-workers/"},
-      "keywords": ["kuwait", "kuwaiti", "civil id", "end of service", "kasambahay"]
+      "keywords": ["civil id", "end of service", "kasambahay"]
     },
     {
       "id": "country_qa_domestic",
@@ -485,7 +496,7 @@
       "body_en": "Qatar's minimum basic wage is QR1,000 a month for all workers, including domestic workers. If the employer gives no food or housing, it must add QR300 for food and QR500 for housing. Domestic Workers Law No. 15 of 2017 limits work to 10 hours a day and gives one day off a week, 3 weeks of paid leave a year and end-of-service pay.",
       "body_fil": "QR1,000 kada buwan ang minimum na basic na sahod sa Qatar para sa lahat ng manggagawa, kasama ang kasambahay. Kung walang pagkain o tirahan mula sa amo, dapat may dagdag na QR300 para sa pagkain at QR500 para sa tirahan. Sa Domestic Workers Law No. 15 of 2017, hanggang 10 oras lang ang trabaho kada araw, may isang day off kada linggo, 3 linggong bayad na bakasyon kada taon at end-of-service pay.",
       "source": {"label": "Qatar Law No. 17 of 2020 (minimum wage); Law No. 15 of 2017 (domestic workers)", "url": "https://gulfmigration.grc.net/qatar-law-no-15-of-2017-regarding-domestic-workers/"},
-      "keywords": ["qatar", "doha", "qr", "qatari", "minimum wage", "kasambahay"]
+      "keywords": ["qr", "minimum wage", "kasambahay"]
     },
     {
       "id": "country_hk_two_week",

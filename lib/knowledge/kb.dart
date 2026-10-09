@@ -121,8 +121,10 @@ class KnowledgeBase {
         final idf = log(1 + (n - df + 0.5) / (df + 0.5));
         s += idf * (tf * 2.2) / (tf + 1.2 * (0.25 + 0.75 * doc.length / _avgLen));
       }
-      final overlap = e.topics.where(topics.contains).length;
-      s += overlap * 2.5;
+      // The country is context and the subject is the question, so a country match counts for less.
+      for (final t in e.topics.where(topics.contains)) {
+        s += t.startsWith('country_') ? 1.0 : 2.5;
+      }
       // A host country's law should only lead when the worker names that country.
       if (e.kind == 'country' && !e.topics.any((t) => t.startsWith('country_') && topics.contains(t))) s *= 0.5;
       if (s > 0) scored.add(MapEntry(e, s));
