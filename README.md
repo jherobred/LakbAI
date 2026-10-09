@@ -8,10 +8,10 @@ Built for AppBuildersPH Hackathon 2026 (theme: Local AI), 9–10 October 2026.
 
 | Platform | Download | Install |
 |---|---|---|
-| **Android 11+** (64-bit phones) | [**lakbai-android.apk**](https://github.com/jherobred/kontrata/releases/latest/download/lakbai-android.apk) | Open the file on your phone, allow **Install unknown apps** for your browser or Files app, then tap **Install**. If Play Protect warns about an unknown developer, tap **Install anyway**. This is a hackathon build. |
-| **iOS 16+** | [**lakbai-ios-unsigned.ipa**](https://github.com/jherobred/kontrata/releases/latest/download/lakbai-ios-unsigned.ipa) | Apple does not allow installing unsigned apps directly. Re-sign it with your Apple ID using [AltStore](https://altstore.io) or [Sideloadly](https://sideloadly.io), or build from source in Xcode (see [iOS](#ios)). |
+| **Android 11+** (64-bit phones) | [**lakbai-android.apk**](https://github.com/jherobred/LakbAI/releases/latest/download/lakbai-android.apk) | Open the file on your phone, allow **Install unknown apps** for your browser or Files app, then tap **Install**. If Play Protect warns about an unknown developer, tap **Install anyway**. This is a hackathon build. |
+| **iOS 16+** | [**lakbai-ios-unsigned.ipa**](https://github.com/jherobred/LakbAI/releases/latest/download/lakbai-ios-unsigned.ipa) | Apple does not allow installing unsigned apps directly. Re-sign it with your Apple ID using [AltStore](https://altstore.io) or [Sideloadly](https://sideloadly.io), or build from source in Xcode (see [iOS](#ios)). |
 
-All builds are on the [Releases page](https://github.com/jherobred/kontrata/releases). The AI model (Qwen3 0.6B) and the voice model (Whisper base) are inside the installer, so LakbAI works in airplane mode from the first launch with nothing else to download.
+All builds are on the [Releases page](https://github.com/jherobred/LakbAI/releases). The AI model (Qwen3 0.6B) and the voice model (Whisper base) are inside the installer, so LakbAI works in airplane mode from the first launch with nothing else to download.
 
 ## The problem
 
@@ -38,7 +38,7 @@ LakbAI covers three gaps:
 | Voice input (speech-to-text) | Yes: Whisper tiny/base via LiteRT | No |
 | Contract reading (OCR) | Yes: Google ML Kit text recognition (bundled model) | No |
 | Clause comparison and minimum-standard checks | Yes: rule engine in Dart | No |
-| Legal knowledge search | Yes: 33-entry cited knowledge base, BM25 search | No |
+| Legal knowledge search | Yes: 34-entry cited knowledge base, BM25 search | No |
 | PDF incident report | Yes: generated on the phone | No |
 | Built-in models (Qwen3 0.6B, Whisper base) | Yes, inside the installer | No |
 | Optional bigger models (Qwen3 0.6B full, Gemma 4 E2B) | — | **Once**, from Hugging Face |
@@ -113,4 +113,7 @@ The codebase targets iOS 16+, and a Mac with Xcode is needed:
 
 ## Team
 
-_Add official team name and members here (must match the AppBuildersPH list)._
+**tigerBytes**
+
+- Jhems Robert B. Reduta ([@jherobred](https://github.com/jherobred))
+- _Add the other members here (must match the AppBuildersPH list)._
