@@ -244,7 +244,7 @@ ContractTerms extractTerms(String text) {
 
 String? _labelValue(String text, List<String> labels) {
   for (final l in labels) {
-    final m = RegExp('${RegExp.escape(l)}\\s*[:\\-]\\s*(?:a|an|the)?\\s*([^\\n,;]{2,60})', caseSensitive: false).firstMatch(text);
+    final m = RegExp('${RegExp.escape(l)}\\s*[:\\-]\\s*(?:(?:a|an|the)\\s+)?([^\\n,;]{2,60})', caseSensitive: false).firstMatch(text);
     if (m != null) {
       final v = m.group(1)!.trim().replaceAll(RegExp(r'\s+'), ' ');
       if (v.isNotEmpty && !RegExp(r'^_+$').hasMatch(v)) return v;
