@@ -150,9 +150,15 @@ class AiService extends ChangeNotifier {
   Future<void> _activateInstalled() async {
     final id = _app.installedModelId;
     if (id == null) return;
+    status = AiStatus.loading;
+    notifyListeners();
+    // Offline first: the active model is remembered across launches, so try
+    // loading it straight from disk before touching the installer at all.
     try {
-      status = AiStatus.loading;
-      notifyListeners();
+      await _load();
+      return;
+    } catch (_) {}
+    try {
       // install() skips the download when the file is already on disk and
       // marks the model as the one getActiveModel loads.
       if (id == 'imported' && _app.importedModelPath != null) {

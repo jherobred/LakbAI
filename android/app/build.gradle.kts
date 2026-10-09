@@ -36,6 +36,10 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // The on-device AI runtime reaches Java classes from native code (JNI);
+            // shrinking can strip them, so keep release builds unshrunk.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
