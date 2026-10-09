@@ -4,6 +4,15 @@
 
 Built for AppBuildersPH Hackathon 2026 (theme: Local AI), 9–10 October 2026.
 
+## Download
+
+| Platform | Download | Install |
+|---|---|---|
+| **Android 11+** (64-bit phones) | [**kontrata-android.apk**](https://github.com/jherobred/kontrata/releases/latest/download/kontrata-android.apk) | Open the file on your phone, allow **Install unknown apps** for your browser or Files app, then tap **Install**. If Play Protect warns about an unknown developer, tap **Install anyway**. This is a hackathon build. |
+| **iOS 16+** | [**kontrata-ios-unsigned.ipa**](https://github.com/jherobred/kontrata/releases/latest/download/kontrata-ios-unsigned.ipa) | Apple does not allow installing unsigned apps directly. Re-sign it with your Apple ID using [AltStore](https://altstore.io) or [Sideloadly](https://sideloadly.io), or build from source in Xcode (see [iOS](#ios)). |
+
+All builds are on the [Releases page](https://github.com/jherobred/kontrata/releases). After installing, open Kontrata once on Wi-Fi to download the AI model. After that it works in airplane mode.
+
 ## The problem
 
 Contract substitution means swapping a DMW-verified contract for a worse one, usually right before departure or after arrival. It is illegal under Labor Code Art. 34(i) and RA 8042 Sec. 6, but workers sign under pressure without spotting lower pay, fewer rest days or a different job. Many never act because they are abroad, afraid, and have no proof.
