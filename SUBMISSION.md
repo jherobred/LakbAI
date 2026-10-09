@@ -8,7 +8,7 @@ Paste each answer into the matching field. Deadline: 10:00 AM, 10 October 2026.
 
 **Short description:** An offline contract checker for Overseas Filipino Workers. It compares the DMW-verified contract with the one handed over abroad, explains every change, and builds a formal incident report. All AI runs on the phone.
 
-**Team members:** tigerBytes. Jhems Robert B. Reduta (@jherobred), _add the other members exactly as on the AppBuildersPH list_.
+**Team members:** tigerBytes. Justin Lars Adriano Ham, Kristina Irish Matignas, Irelle Jann Miranda, Jhems Robert B. Reduta (@jherobred).
 
 **Public GitHub repository:** https://github.com/jherobred/LakbAI
 

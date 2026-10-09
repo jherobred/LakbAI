@@ -115,5 +115,7 @@ The codebase targets iOS 16+, and a Mac with Xcode is needed:
 
 **tigerBytes**
 
+- Justin Lars Adriano Ham
+- Kristina Irish Matignas
+- Irelle Jann Miranda
 - Jhems Robert B. Reduta ([@jherobred](https://github.com/jherobred))
-- _Add the other members here (must match the AppBuildersPH list)._
