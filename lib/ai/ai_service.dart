@@ -150,6 +150,9 @@ class AiService extends ChangeNotifier {
 
   bool get ready => status == AiStatus.ready;
 
+  /// Whether the active model writes usable Filipino. Qwen3 0.6B does not.
+  bool get writesFilipino => active?.type == ModelType.gemma4;
+
   /// True when the installer carries the model files, so nothing has to be downloaded.
   bool modelBundled = false;
   bool voiceBundled = false;
@@ -315,7 +318,8 @@ class AiService extends ChangeNotifier {
   }
 
   /// Streams a reply token by token. Each question gets a fresh chat so a
-  /// small model never runs out of context.
+  /// small model never runs out of context. Generation stops early once the
+  /// model starts repeating itself, so a loop does not burn the token budget.
   Stream<String> ask({required String system, required String prompt, int maxOutputTokens = 360}) async* {
     if (_model == null) throw StateError('model-not-ready');
     while (_busy) {
@@ -332,8 +336,17 @@ class AiService extends ChangeNotifier {
         enableThinking: false,
       );
       await _chat!.addQueryChunk(Message(text: prompt, isUser: true));
+      final raw = StringBuffer();
+      var halted = false;
       await for (final r in _chat!.generateChatResponseAsync()) {
-        if (r is TextResponse) yield r.token;
+        if (r is! TextResponse || halted) continue;
+        raw.write(r.token);
+        yield r.token;
+        if (isLooping(raw.toString())) {
+          halted = true;
+          // Same path as the user's stop: the stream ends on its own after this.
+          unawaited(_chat!.stopGeneration().catchError((_) {}));
+        }
       }
     } finally {
       try {
@@ -426,12 +439,79 @@ class AiService extends ChangeNotifier {
   }
 }
 
-/// Small models sometimes leak template tokens or think-tags; strip them.
+final _sourceLine = RegExp(r'^\s*(?:[-*•]\s*)?\**\s*(?:source|sources|pinagmulan|batayan)\s*\**\s*:\s*\**\s*"?(.*?)[\s*"]*$', caseSensitive: false);
+final _trailingSource = RegExp(r'^(.*[.!?])\s+\**source\**\s*:\s*(.+)$', caseSensitive: false);
+final _doubleBullet = RegExp(r'^(\s*)[-*•]\s+["“]?[-*•]\s+');
+final _echo = RegExp(
+    r'^(\s*(?:[-*•]|\d+\.)\s+)?\**\s*(?:one short sentence(?: that answers(?: the question)?)?|bold(?: numbers)?|last line|bullet points?(?: (?:that )?start(?:s|ing)? with "- ")?)\s*\**\s*(?::\s*\**\s*|$)',
+    caseSensitive: false);
+
+/// Small models leak template tokens and think-tags, copy words from the
+/// format instructions ("**Bold**:"), repeat lines, and write the
+/// "Source:" line more than once. Strip all of that and keep one Source
+/// line at the end.
 String cleanModelText(String s) {
   var t = s.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
   t = t.replaceAll(RegExp(r'<\|[^|]*\|>'), '');
   t = t.replaceAll(RegExp(r'</?(start_of_turn|end_of_turn|eos|bos)>'), '');
-  return t.trim();
+  final kept = <String>[];
+  String? source;
+  for (var line in t.split('\n')) {
+    final blank = line.trim().isEmpty;
+    line = line.replaceFirstMapped(_doubleBullet, (m) => '${m[1]}- ');
+    line = line.replaceFirstMapped(_echo, (m) => m[1] ?? '');
+    // Nothing but bullet marks left (an echo, or "- " before an indented line).
+    if (!blank && line.replaceAll(RegExp(r'[-*•\s]'), '').isEmpty) continue;
+    // A bullet the model wrapped in quotes often loses its opening quote.
+    if ('"'.allMatches(line).length == 1) line = line.replaceFirst('"', '');
+    final inline = _trailingSource.firstMatch(line);
+    if (inline != null) {
+      source ??= inline[2]!.trim();
+      line = inline[1]!;
+    }
+    final src = _sourceLine.firstMatch(line);
+    if (src != null) {
+      final law = src[1]!.trim();
+      if (law.isNotEmpty && !law.contains('<')) source ??= law;
+      continue;
+    }
+    if (line.trim().isNotEmpty && kept.any((k) => _nearDuplicate(k, line))) continue;
+    kept.add(line);
+  }
+  var out = kept.join('\n').replaceAll(RegExp(r'\n{3,}'), '\n\n').trim();
+  if (source != null) out = '$out\n\nSource: $source';
+  return out.trim();
+}
+
+List<String> _words(String s) => s.toLowerCase().split(RegExp(r'[^\p{L}\p{N}]+', unicode: true)).where((w) => w.isNotEmpty).toList();
+
+/// Two lines of five or more words that share at least 90% of their words.
+/// Lines that differ by one number stay apart, so distinct facts survive.
+bool _nearDuplicate(String a, String b) {
+  final x = _words(a).toSet();
+  final y = _words(b).toSet();
+  if (x.length < 5 || y.length < 5) return false;
+  return x.intersection(y).length / x.union(y).length >= 0.9;
+}
+
+/// True once a reply has started to loop: a finished line that nearly
+/// repeats an earlier one, a second Source line, or the same four words
+/// three times.
+bool isLooping(String text) {
+  final words = _words(text);
+  if (words.length >= 12) {
+    final last = words.sublist(words.length - 4).join(' ');
+    var seen = 0;
+    for (var i = 0; i + 4 <= words.length; i++) {
+      if (words.sublist(i, i + 4).join(' ') == last && ++seen >= 3) return true;
+    }
+  }
+  final lines = text.split('\n');
+  final done = lines.sublist(0, lines.length - 1).where((l) => l.trim().isNotEmpty).toList();
+  if (done.where(_sourceLine.hasMatch).length >= 2) return true;
+  if (done.length < 2) return false;
+  final latest = done.last;
+  return done.sublist(0, done.length - 1).any((l) => _nearDuplicate(l, latest));
 }
 
 /// Whisper writes tags like [BLANK_AUDIO] or (music) for silence and noise,

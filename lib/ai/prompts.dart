@@ -1,16 +1,18 @@
 import '../knowledge/kb.dart';
+import 'ai_service.dart';
 
 /// Kept short on purpose: every token here is re-read by the small on-device
 /// model before each reply, so a shorter prompt means a faster first word.
+/// The language and format rules go at the end of the prompt instead,
+/// because small models follow the most recent line best.
 String systemPrompt({required bool fil}) => '''
-You are LakbAI, a friendly offline helper for Overseas Filipino Workers (OFWs).
-Answer in ${fil ? 'simple Filipino (Taglish is fine)' : 'simple English'}.
-Format:
-1. One short sentence that answers directly.
-2. Up to 3 bullet points ("- ") with what to do or know. Use **bold** for key numbers.
-3. A last line: "Source: <law>".
-Use only facts from CONTEXT. Never invent laws, numbers or phone numbers. If CONTEXT does not cover it, say so and suggest calling 1348.
+You are LakbAI, an offline helper for Overseas Filipino Workers (OFWs).
+Use only facts from CONTEXT. Never invent laws, numbers or phone numbers. If CONTEXT does not answer the question, say so and suggest calling 1348.
 Never push the worker to confront the employer. If they are in danger, tell them to call 1343 or 1348 first.''';
+
+/// Qwen3 0.6B writes broken Filipino but clear English, so only a model that
+/// handles Filipino well (Gemma 4) is asked to answer in Filipino.
+bool _writeFil(bool fil) => fil && AiService.instance.writesFilipino;
 
 /// Long entries slow the model down; the first sentences carry the facts.
 String _clip(String s, int max) {
@@ -23,18 +25,38 @@ String _clip(String s, int max) {
 String buildContext(List<KbEntry> entries, {required bool fil}) {
   final b = StringBuffer('CONTEXT:\n');
   for (final e in entries) {
-    b.writeln('- ${e.titleEn}: ${_clip(e.bodyEn, 320)} (Source: ${e.sourceLabel})');
+    // The law goes in plain brackets: a "Source:" label here gets copied into every bullet.
+    b.writeln('- ${e.titleEn}: ${_clip(e.bodyEn, 320)} (${e.sourceLabel})');
   }
   return b.toString();
 }
 
 String buildPrompt({required String question, required List<KbEntry> context, required bool fil, String? lastExchange}) {
   final b = StringBuffer(buildContext(context, fil: fil));
-  if (lastExchange != null && lastExchange.isNotEmpty) {
+  // The earlier exchange only helps a follow-up. On a new question it costs
+  // ~100 tokens and pulls a small model back to the old topic.
+  if (lastExchange != null && lastExchange.isNotEmpty && isFollowUp(question)) {
     b.writeln('\nEARLIER:\n$lastExchange');
   }
   b.writeln('\nQUESTION: $question');
+  final lang = _writeFil(fil) ? 'simple Filipino (Taglish is fine)' : 'simple English';
+  b.write('Reply in $lang: one short sentence that answers the question, then up to 3 bullet points that start with "- ". '
+      'Then write one last line: "Source: " and the law named in CONTEXT.');
   return b.toString();
+}
+
+const _followUpStarts = [
+  'and ', 'also ', 'then ', 'so ', 'but ', 'in ', 'for ', 'how much', 'what about', 'how about', 'what if',
+  'at ', 'tapos', 'eh ', 'e ', 'sa ', 'pero ', 'paano kung', 'pano kung', 'paano naman', 'magkano naman',
+];
+final _followUpWords = RegExp(r'\b(what about|how about|paano kung|pano kung|kung ganun|kung ganoon|iyan|yan|iyon|yun)\b');
+
+/// Whether [question] leans on the previous answer ("what about in Kuwait?",
+/// "paano kung ayaw nila?"), so the earlier exchange is worth its tokens.
+bool isFollowUp(String question) {
+  final t = question.toLowerCase().trim();
+  if (t.split(RegExp(r'\s+')).length <= 2) return true;
+  return _followUpStarts.any(t.startsWith) || _followUpWords.hasMatch(t);
 }
 
 /// Used when no model is installed yet, or the phone is too busy:
@@ -64,7 +86,7 @@ CONTEXT:
 CHANGES FOUND BETWEEN THE VERIFIED CONTRACT AND THE NEW ONE:
 $diffSummary
 
-Explain to the worker in ${fil ? 'simple Filipino' : 'simple English'}, in under 110 words, what these changes mean for them. Start with one plain sentence, then short "- " bullets. Be calm. Do not tell them to confront anyone. End by saying they can keep this evidence and decide later.''';
+Explain to the worker in ${_writeFil(fil) ? 'simple Filipino' : 'simple English'}, in under 110 words, what these changes mean for them. Start with one plain sentence, then short "- " bullets. Be calm. Do not tell them to confront anyone. End by saying they can keep this evidence and decide later.''';
 
 String statementPrompt({required String rawText, required bool fil}) => '''
 Rewrite the worker's account below as a clear, first-person statement for an incident report, in ${fil ? 'Filipino' : 'English'}.
