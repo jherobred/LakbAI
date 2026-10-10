@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
@@ -120,11 +121,11 @@ class _AiSparkState extends State<AiSpark> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: AnimatedBuilder(
-        animation: _c,
-        builder: (context, _) => Transform.rotate(
-          angle: Curves.easeInOutCubic.transform(_c.value) * math.pi,
-          child: CustomPaint(size: Size.square(widget.size), painter: _SparkPainter()),
-        ),
+          animation: _c,
+          builder: (context, _) => Transform.rotate(
+            angle: Curves.easeInOutCubic.transform(_c.value) * math.pi,
+            child: CustomPaint(size: Size.square(widget.size), painter: _SparkPainter()),
+          ),
       ),
     );
   }
@@ -154,16 +155,101 @@ class _SparkPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Gemini-style placeholder lines with a moving colour sweep, shown while
-/// the model reads the question and before its first word arrives.
-class ThinkingShimmer extends StatefulWidget {
-  const ThinkingShimmer({super.key});
+/// A liquid orb in the AI colours: its edge ripples and its colours turn
+/// while the model works.
+class LiquidOrb extends StatefulWidget {
+  const LiquidOrb({super.key, this.size = 28});
+  final double size;
   @override
-  State<ThinkingShimmer> createState() => _ThinkingShimmerState();
+  State<LiquidOrb> createState() => _LiquidOrbState();
 }
 
-class _ThinkingShimmerState extends State<ThinkingShimmer> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat();
+class _LiquidOrbState extends State<LiquidOrb> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 2600));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Motion.reduced(context)) {
+      _c.stop();
+    } else if (!_c.isAnimating) {
+      _c.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      RepaintBoundary(child: CustomPaint(size: Size.square(widget.size), painter: _OrbPainter(_c)));
+}
+
+class _OrbPainter extends CustomPainter {
+  _OrbPainter(this.t) : super(repaint: t);
+  final Animation<double> t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final v = t.value * 2 * math.pi;
+    final c = size.center(Offset.zero);
+    final r = size.width / 2 * 0.82;
+    final blob = Path();
+    const n = 48;
+    for (var i = 0; i <= n; i++) {
+      final a = i / n * 2 * math.pi;
+      final rr = r * (1 + 0.07 * math.sin(3 * a + v) + 0.04 * math.sin(2 * a - 2 * v));
+      final p = c + Offset(math.cos(a), math.sin(a)) * rr;
+      i == 0 ? blob.moveTo(p.dx, p.dy) : blob.lineTo(p.dx, p.dy);
+    }
+    blob.close();
+    final box = Offset.zero & size;
+    canvas.drawPath(blob, Paint()..color = KColors.purple.withValues(alpha: 0.4)..maskFilter = MaskFilter.blur(BlurStyle.normal, size.width * 0.16));
+    canvas.drawPath(
+      blob,
+      Paint()
+        ..shader = SweepGradient(
+          colors: KColors.aiLoop,
+          transform: GradientRotation(v),
+        ).createShader(box),
+    );
+    // Glossy highlight, so it reads as liquid rather than a flat disc.
+    final hc = c + Offset(-r * 0.3, -r * 0.35);
+    canvas.drawCircle(
+      hc,
+      r * 0.5,
+      Paint()..shader = RadialGradient(colors: [Colors.white.withValues(alpha: 0.75), Colors.white.withValues(alpha: 0)]).createShader(Rect.fromCircle(center: hc, radius: r * 0.5)),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _OrbPainter old) => false;
+}
+
+/// Text with a bright band sweeping across it, used for "Thinking…".
+class ShimmerText extends StatefulWidget {
+  const ShimmerText(this.text, {super.key, this.style});
+  final String text;
+  final TextStyle? style;
+  @override
+  State<ShimmerText> createState() => _ShimmerTextState();
+}
+
+class _ShimmerTextState extends State<ShimmerText> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (Motion.reduced(context)) {
+      _c.stop();
+    } else if (!_c.isAnimating) {
+      _c.repeat();
+    }
+  }
 
   @override
   void dispose() {
@@ -174,31 +260,175 @@ class _ThinkingShimmerState extends State<ThinkingShimmer> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final base = dark ? const Color(0xFF2A3A5C) : const Color(0xFFD3E3FD);
-    final hi = dark ? const Color(0xFF6A5A9C) : const Color(0xFFE8DEF8);
-    Widget line(double f) => FractionallySizedBox(
-          widthFactor: f,
-          alignment: Alignment.centerLeft,
-          child: Container(height: 13, margin: const EdgeInsets.symmetric(vertical: 5), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99))),
-        );
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      AnimatedBuilder(
+    final base = cs.onSurfaceVariant;
+    final hi = Theme.of(context).brightness == Brightness.dark ? Colors.white : cs.primary;
+    return RepaintBoundary(
+      child: AnimatedBuilder(
         animation: _c,
         builder: (context, child) => ShaderMask(
           blendMode: BlendMode.srcIn,
           shaderCallback: (r) => LinearGradient(
-            colors: [base, hi, cs.surface.withValues(alpha: 0.6), base],
-            stops: const [0, 0.35, 0.5, 1],
+            colors: [base, base, hi, base, base],
+            stops: const [0, 0.35, 0.5, 0.65, 1],
             begin: Alignment(-3 + 4 * _c.value, 0),
             end: Alignment(-1 + 4 * _c.value, 0),
           ).createShader(r),
           child: child,
         ),
-        child: Column(children: [line(1), line(0.92), line(0.6)]),
+        child: Text(widget.text, style: widget.style),
       ),
-    ]);
+    );
   }
+}
+
+/// Shown while the model reads the question, before its first word arrives:
+/// a liquid orb, a shimmering "Thinking…", and the laws it is reading.
+class ThinkingIndicator extends StatelessWidget {
+  const ThinkingIndicator({super.key, required this.label, this.detail});
+  final String label;
+  final String? detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    // A live region, so screen readers announce "Thinking…" when it appears.
+    return Semantics(
+      liveRegion: true,
+      child: Row(children: [
+        const LiquidOrb(size: 30),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+            ShimmerText(label, style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600)),
+            if (detail != null) ...[
+              const SizedBox(height: 2),
+              Text(detail!, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, color: cs.onSurfaceVariant)),
+            ],
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+/// Frosted-glass surface for the chat box. Content behind it blurs through;
+/// while [active], a gradient ring flows around its edge.
+class LiquidGlass extends StatefulWidget {
+  const LiquidGlass({super.key, required this.child, this.active = false, this.radius = 30});
+  final Widget child;
+  final bool active;
+  final double radius;
+  @override
+  State<LiquidGlass> createState() => _LiquidGlassState();
+}
+
+class _LiquidGlassState extends State<LiquidGlass> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 3200));
+
+  void _sync() {
+    final run = widget.active && !Motion.reduced(context);
+    if (run && !_c.isAnimating) _c.repeat();
+    if (!run && _c.isAnimating) _c.stop();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(LiquidGlass old) {
+    super.didUpdateWidget(old);
+    _sync();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final lite = Motion.reduced(context);
+    final radius = BorderRadius.circular(widget.radius);
+    final fill = dark ? KColors.dGlass : KColors.lBg;
+    Widget body = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        // Opaque in lite mode; otherwise translucent, lighter at the top edge like a glass pane.
+        color: lite ? fill : null,
+        gradient: lite
+            ? null
+            : LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [fill.withValues(alpha: dark ? 0.82 : 0.9), fill.withValues(alpha: dark ? 0.66 : 0.72)],
+              ),
+      ),
+      child: widget.child,
+    );
+    if (!lite) body = BackdropFilter(filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22), child: body);
+    return AnimatedContainer(
+      duration: Motion.d(context, 300),
+      decoration: BoxDecoration(
+        borderRadius: radius,
+        boxShadow: [
+          BoxShadow(
+            color: widget.active ? KColors.blue.withValues(alpha: dark ? 0.28 : 0.2) : Colors.black.withValues(alpha: dark ? 0.4 : 0.05),
+            blurRadius: widget.active ? 28 : 20,
+            offset: Offset(0, widget.active ? 8 : 4),
+          ),
+        ],
+      ),
+      // The ring sits on its own layer, so its animation does not repaint the chat box contents.
+      child: Stack(children: [
+        ClipRRect(borderRadius: radius, child: body),
+        Positioned.fill(
+          child: IgnorePointer(
+            child: RepaintBoundary(
+              child: CustomPaint(painter: _RingPainter(_c, active: widget.active, dark: dark, radius: widget.radius)),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class _RingPainter extends CustomPainter {
+  _RingPainter(this.t, {required this.active, required this.dark, required this.radius}) : super(repaint: t);
+  final Animation<double> t;
+  final bool active;
+  final bool dark;
+  final double radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final box = Offset.zero & size;
+    final rr = RRect.fromRectAndRadius(box.deflate(0.75), Radius.circular(radius));
+    if (!active) {
+      canvas.drawRRect(
+        rr,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2
+          ..color = dark ? Colors.white.withValues(alpha: 0.16) : KColors.lPrimary.withValues(alpha: 0.22),
+      );
+      return;
+    }
+    final shader = SweepGradient(
+      colors: KColors.aiLoop,
+      transform: GradientRotation(t.value * 2 * math.pi),
+    ).createShader(box);
+    canvas.drawRRect(rr, Paint()..style = PaintingStyle.stroke..strokeWidth = 4..shader = shader..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5));
+    canvas.drawRRect(rr, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.8..shader = shader);
+  }
+
+  @override
+  bool shouldRepaint(covariant _RingPainter old) => old.active != active || old.dark != dark || old.radius != radius;
 }
 
 /// Illustration for the contract checker: the verified contract and the

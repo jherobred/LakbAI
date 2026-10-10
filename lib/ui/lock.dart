@@ -52,27 +52,29 @@ class _LockScreenState extends State<LockScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final len = AppScope.of(context).pinLength;
-    return Scaffold(
-      body: SafeArea(
-        child: Column(children: [
-          const Spacer(),
-          const KLogo(size: 64),
-          const SizedBox(height: 20),
-          Text(tr(context, 'Enter your PIN', 'Ilagay ang PIN mo'), style: Theme.of(context).textTheme.headlineSmall),
-          const SizedBox(height: 8),
-          AnimatedOpacity(
-            opacity: _wrong ? 1 : 0,
-            duration: Motion.d(context, 200),
-            child: Text(tr(context, 'Wrong PIN. Try again.', 'Mali ang PIN. Subukan ulit.'), style: TextStyle(color: cs.error)),
-          ),
-          const SizedBox(height: 16),
-          PinDots(length: _pin.length, slots: len ?? (_pin.length < 4 ? 4 : _pin.length))
-              .animate(key: ValueKey(_shake))
-              .shakeX(hz: 6, amount: _shake == 0 ? 0 : 8, duration: 420.ms),
-          const Spacer(),
-          PinKeypad(onDigit: _tap, onBack: () => setState(() => _pin = _pin.isEmpty ? '' : _pin.substring(0, _pin.length - 1))),
-          const SizedBox(height: 24),
-        ]),
+    return BackToExit(
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(children: [
+            const Spacer(),
+            const KLogo(size: 64),
+            const SizedBox(height: 20),
+            Text(tr(context, 'Enter your PIN', 'Ilagay ang PIN mo'), style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 8),
+            AnimatedOpacity(
+              opacity: _wrong ? 1 : 0,
+              duration: Motion.d(context, 200),
+              child: Text(tr(context, 'Wrong PIN. Try again.', 'Mali ang PIN. Subukan ulit.'), style: TextStyle(color: cs.error)),
+            ),
+            const SizedBox(height: 16),
+            PinDots(length: _pin.length, slots: len ?? (_pin.length < 4 ? 4 : _pin.length))
+                .animate(key: ValueKey(_shake))
+                .shakeX(hz: 6, amount: _shake == 0 ? 0 : 8, duration: 420.ms),
+            const Spacer(),
+            PinKeypad(onDigit: _tap, onBack: () => setState(() => _pin = _pin.isEmpty ? '' : _pin.substring(0, _pin.length - 1))),
+            const SizedBox(height: 24),
+          ]),
+        ),
       ),
     );
   }

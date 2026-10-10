@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../ai/ai_service.dart';
 import '../cases/cases.dart';
+import '../chat/chat_history.dart';
 import '../core/app_state.dart';
 import '../knowledge/kb.dart';
 import '../theme.dart';
@@ -154,7 +155,7 @@ class SettingsScreen extends StatelessWidget {
                   ListTile(
                     leading: Icon(Icons.delete_forever_rounded, color: t.danger),
                     title: Text(tr(context, 'Delete everything', 'Burahin lahat'), style: TextStyle(fontWeight: FontWeight.w700, color: t.danger)),
-                    subtitle: Text(tr(context, 'Removes all cases, photos, reports and settings', 'Buburahin ang lahat ng kaso, litrato, report at settings')),
+                    subtitle: Text(tr(context, 'Removes all chats, cases, photos, reports and settings', 'Buburahin ang lahat ng chat, kaso, litrato, report at settings')),
                     onTap: () async {
                       final ok = await showDialog<bool>(
                         context: context,
@@ -169,6 +170,7 @@ class SettingsScreen extends StatelessWidget {
                       );
                       if (ok == true) {
                         await CaseRepository.instance.wipeAll();
+                        await ChatHistory.instance.deleteAll();
                         await AiService.instance.deleteModel();
                         await s.wipe();
                         if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);

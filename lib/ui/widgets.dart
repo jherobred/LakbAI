@@ -16,6 +16,50 @@ Future<T?> openPage<T>(BuildContext context, Widget page) {
   return Navigator.of(context).push<T>(MaterialPageRoute(builder: (_) => page));
 }
 
+/// Root screens have no route under them, so Android's back would close the
+/// app. Back first goes to [onBack] (return true when it handled it), then
+/// asks for a second back within two seconds before exiting.
+class BackToExit extends StatefulWidget {
+  const BackToExit({super.key, required this.child, this.onBack});
+  final Widget child;
+  final bool Function()? onBack;
+
+  @override
+  State<BackToExit> createState() => _BackToExitState();
+}
+
+class _BackToExitState extends State<BackToExit> {
+  DateTime? _last;
+
+  void _onBack() {
+    if (widget.onBack?.call() ?? false) return;
+    final now = DateTime.now();
+    if (_last != null && now.difference(_last!) < const Duration(seconds: 2)) {
+      SystemNavigator.pop();
+      return;
+    }
+    _last = now;
+    HapticFeedback.selectionClick();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        duration: const Duration(seconds: 2),
+        content: Text(tr(context, 'Go back again to exit', 'Bumalik ulit para lumabas')),
+      ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _onBack();
+      },
+      child: widget.child,
+    );
+  }
+}
+
 Future<void> callNumber(BuildContext context, String number) async {
   HapticFeedback.selectionClick();
   final uri = Uri(scheme: 'tel', path: number.replaceAll(' ', ''));

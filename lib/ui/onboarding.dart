@@ -35,59 +35,66 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final last = _page == _count - 1;
-    return Scaffold(
-      body: Stack(children: [
-        const _Backdrop(),
-        SafeArea(
-          child: Column(children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 12, 0),
-              child: Row(children: [
-                const KLogo(size: 30),
-                const SizedBox(width: 8),
-                Text('LakbAI', style: Theme.of(context).textTheme.titleMedium),
-                const Spacer(),
-                const _LangToggle(),
-              ]),
-            ),
-            Expanded(
-              child: PageView(
-                controller: _pc,
-                onPageChanged: (i) => setState(() => _page = i),
-                children: const [_Welcome(), _Privacy(), _HowItWorks(), _Country(), _AiSetup()],
+    return BackToExit(
+      onBack: () {
+        if (_page == 0) return false;
+        _go(_page - 1);
+        return true;
+      },
+      child: Scaffold(
+        body: Stack(children: [
+          const _Backdrop(),
+          SafeArea(
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 12, 0),
+                child: Row(children: [
+                  const KLogo(size: 30),
+                  const SizedBox(width: 8),
+                  Text('LakbAI', style: Theme.of(context).textTheme.titleMedium),
+                  const Spacer(),
+                  const _LangToggle(),
+                ]),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-              child: Row(children: [
-                _Dots(count: _count, index: _page),
-                const Spacer(),
-                AnimatedSwitcher(
-                  duration: Motion.d(context, 250),
-                  child: _page == 0
-                      ? const SizedBox(width: 0)
-                      : TextButton(key: const ValueKey('back'), onPressed: () => _go(_page - 1), child: Text(tr(context, 'Back', 'Bumalik'))),
+              Expanded(
+                child: PageView(
+                  controller: _pc,
+                  onPageChanged: (i) => setState(() => _page = i),
+                  children: const [_Welcome(), _Privacy(), _HowItWorks(), _Country(), _AiSetup()],
                 ),
-                const SizedBox(width: 6),
-                FilledButton(
-                  onPressed: () async {
-                    if (!last) return _go(_page + 1);
-                    await _finish(context);
-                  },
-                  child: AnimatedSwitcher(
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+                child: Row(children: [
+                  _Dots(count: _count, index: _page),
+                  const Spacer(),
+                  AnimatedSwitcher(
                     duration: Motion.d(context, 250),
-                    child: Text(
-                      last ? tr(context, 'Start', 'Simulan') : tr(context, 'Next', 'Susunod'),
-                      key: ValueKey(last),
+                    child: _page == 0
+                        ? const SizedBox(width: 0)
+                        : TextButton(key: const ValueKey('back'), onPressed: () => _go(_page - 1), child: Text(tr(context, 'Back', 'Bumalik'))),
+                  ),
+                  const SizedBox(width: 6),
+                  FilledButton(
+                    onPressed: () async {
+                      if (!last) return _go(_page + 1);
+                      await _finish(context);
+                    },
+                    child: AnimatedSwitcher(
+                      duration: Motion.d(context, 250),
+                      child: Text(
+                        last ? tr(context, 'Start', 'Simulan') : tr(context, 'Next', 'Susunod'),
+                        key: ValueKey(last),
+                      ),
                     ),
                   ),
-                ),
-              ]),
-            ),
-          ]),
-        ),
-      ]),
-      backgroundColor: cs.surfaceContainerLowest,
+                ]),
+              ),
+            ]),
+          ),
+        ]),
+        backgroundColor: cs.surfaceContainerLowest,
+      ),
     );
   }
 

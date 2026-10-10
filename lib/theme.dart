@@ -6,10 +6,10 @@ class KColors {
   // Light
   static const lBg = Color(0xFFFFFFFF);
   static const lSurface = Color(0xFFFFFFFF);
-  static const lSurfaceAlt = Color(0xFFF0F4F9);
-  static const lInk = Color(0xFF1F1F1F);
-  static const lInkSoft = Color(0xFF444746);
-  static const lOutline = Color(0xFFC4C7C5);
+  static const lSurfaceAlt = Color(0xFFE9EEF6);
+  static const lInk = Color(0xFF15171A);
+  static const lInkSoft = Color(0xFF3C4043);
+  static const lOutline = Color(0xFF747775);
   static const lPrimary = Color(0xFF0B57D0);
   static const lPrimaryContainer = Color(0xFFD3E3FD);
   static const lOnPrimaryContainer = Color(0xFF041E49);
@@ -17,9 +17,9 @@ class KColors {
   // Dark
   static const dBg = Color(0xFF131314);
   static const dSurface = Color(0xFF1B1B1C);
-  static const dSurfaceAlt = Color(0xFF1E1F20);
-  static const dInk = Color(0xFFE3E3E3);
-  static const dInkSoft = Color(0xFFC4C7C5);
+  static const dSurfaceAlt = Color(0xFF232528);
+  static const dInk = Color(0xFFF1F3F4);
+  static const dInkSoft = Color(0xFFCDD0D3);
   static const dOutline = Color(0xFF8E918F);
   static const dPrimary = Color(0xFFA8C7FA);
   static const dPrimaryContainer = Color(0xFF0842A0);
@@ -34,6 +34,12 @@ class KColors {
 
   /// The blue-violet-rose sweep used for the AI's spark and its "thinking" shimmer.
   static const ai = [blue, purple, rose];
+
+  /// The same sweep closed into a loop, for the liquid orb and the chat box ring.
+  static const aiLoop = [blue, purple, rose, cyan, blue];
+
+  /// Frosted-glass fill for the chat box in dark mode (light mode uses [lBg]).
+  static const dGlass = Color(0xFF202226);
 }
 
 /// Semantic tokens that Material's ColorScheme does not cover.
@@ -109,11 +115,11 @@ class KTheme {
       surfaceContainerLowest: bg,
       surfaceContainerLow: dark ? KColors.dSurface : const Color(0xFFF8FAFD),
       surfaceContainer: dark ? KColors.dSurfaceAlt : KColors.lSurfaceAlt,
-      surfaceContainerHigh: dark ? const Color(0xFF282A2C) : const Color(0xFFE9EEF6),
-      surfaceContainerHighest: dark ? const Color(0xFF333537) : const Color(0xFFDDE3EA),
+      surfaceContainerHigh: dark ? const Color(0xFF2D3034) : const Color(0xFFE0E7F1),
+      surfaceContainerHighest: dark ? const Color(0xFF383B3F) : const Color(0xFFD5DDE8),
       onSurfaceVariant: dark ? KColors.dInkSoft : KColors.lInkSoft,
       outline: dark ? KColors.dOutline : KColors.lOutline,
-      outlineVariant: dark ? const Color(0xFF444746) : const Color(0xFFE1E3E1),
+      outlineVariant: dark ? const Color(0xFF5A5D60) : const Color(0xFFC4C7C5),
       shadow: Colors.black,
       scrim: Colors.black,
       inverseSurface: dark ? KColors.dInk : const Color(0xFF303030),
@@ -132,9 +138,9 @@ class KTheme {
         end: Alignment.bottomRight,
         colors: dark
             ? const [Color(0xFF0842A0), Color(0xFF0B57D0), Color(0xFF5B3FA8)]
-            : const [Color(0xFF0B57D0), Color(0xFF4285F4), Color(0xFF8E6CD8)],
+            : const [Color(0xFF0B57D0), Color(0xFF2F6FE4), Color(0xFF6A45C2)],
       ),
-      userBubble: dark ? const Color(0xFF333537) : const Color(0xFFE9EEF6),
+      userBubble: dark ? const Color(0xFF1F4FB0) : const Color(0xFF0B57D0),
       glow: dark ? const Color(0x334285F4) : const Color(0x224285F4),
       ai: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: KColors.ai),
     );

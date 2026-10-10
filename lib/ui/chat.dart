@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../ai/ai_service.dart';
 import '../ai/prompts.dart';
+import '../chat/chat_history.dart';
 import '../core/app_state.dart';
 import '../knowledge/kb.dart';
 import '../knowledge/topics.dart';
 import '../theme.dart';
 import 'ai_widgets.dart';
 import 'cases_screen.dart';
+import 'chat_history_sheet.dart';
 import 'ladder.dart';
 import 'recruiter.dart';
 import 'rights.dart';
@@ -21,7 +24,16 @@ import 'widgets.dart';
 class ChatMessage {
   ChatMessage({required this.fromUser, required String text, this.topics = const {}, this.sources = const [], this.streaming = false})
       : text = ValueNotifier(text),
-        id = '${DateTime.now().microsecondsSinceEpoch}';
+        // The counter keeps ids unique when a saved chat restores many messages in the same instant.
+        id = '${DateTime.now().microsecondsSinceEpoch}-${_seq++}';
+
+  /// A message restored from chat history: shown as-is, without the entrance animation.
+  factory ChatMessage.fromSaved(SavedMessage m) =>
+      ChatMessage(fromUser: m.fromUser, text: m.text, topics: m.topics.toSet(), sources: List.of(m.sources))
+        ..byAi = m.byAi
+        ..animated = true;
+
+  static int _seq = 0;
   final String id;
   final bool fromUser;
   final ValueNotifier<String> text;
@@ -32,6 +44,8 @@ class ChatMessage {
 
   /// Whether the on-device model wrote this reply (false: the built-in guide did).
   bool byAi = false;
+
+  SavedMessage toSaved() => SavedMessage(fromUser: fromUser, text: text.value, topics: topics.toList(), sources: sources, byAi: byAi);
 }
 
 /// Highlights topic keywords inside the text field as the user types.
@@ -75,6 +89,10 @@ class _ChatScreenState extends State<ChatScreen> {
   final Set<String> _dismissed = {};
   List<Topic> _typed = [];
   bool _generating = false;
+
+  /// History id of the chat on screen; null until its first answer is saved.
+  String? _chatId;
+  final _panelHeight = ValueNotifier<double>(160);
   late final _voice = VoiceCapture(onAutoStop: _finishVoice);
 
   @override
@@ -89,6 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _input.dispose();
     _focus.dispose();
     _scroll.dispose();
+    _panelHeight.dispose();
     _voice.dispose();
     super.dispose();
   }
@@ -135,14 +154,21 @@ class _ChatScreenState extends State<ChatScreen> {
         final last = _lastExchange();
         // Keep the raw stream and show a cleaned copy, so line breaks between tokens survive.
         final raw = StringBuffer();
+        // Redraw at most every 40 ms instead of on every token; the first word shows at once.
+        final sinceDraw = Stopwatch();
         await for (final tok in ai.ask(
           system: systemPrompt(fil: fil),
           prompt: buildPrompt(question: text, context: kb, fil: fil, lastExchange: last),
           maxOutputTokens: 260,
         )) {
           raw.write(tok);
+          if (sinceDraw.isRunning && sinceDraw.elapsedMilliseconds < 40) continue;
+          sinceDraw
+            ..reset()
+            ..start();
           reply.text.value = cleanModelText(raw.toString());
         }
+        reply.text.value = cleanModelText(raw.toString());
         if (reply.text.value.trim().isEmpty) {
           reply.byAi = false;
           reply.text.value = extractiveAnswer(kb, fil: fil);
@@ -157,7 +183,61 @@ class _ChatScreenState extends State<ChatScreen> {
     } finally {
       reply.streaming = false;
       if (mounted) setState(() => _generating = false);
+      await _saveChat();
     }
+  }
+
+  /// Keeps the chat on screen in the on-phone history, newest first.
+  Future<void> _saveChat() async {
+    final done = _messages.where((m) => !m.streaming && m.text.value.trim().isNotEmpty).toList();
+    if (done.isEmpty) return;
+    _chatId ??= ChatHistory.instance.newId();
+    try {
+      await ChatHistory.instance.save(Conversation(id: _chatId!, updatedAt: DateTime.now(), messages: done.map((m) => m.toSaved()).toList()));
+    } catch (_) {
+      // History is a convenience; a failed write must never break the chat.
+    }
+  }
+
+  Future<void> _openHistory() async {
+    // Switching chats mid-answer would save the answer into the wrong chat.
+    if (_generating) return;
+    _focus.unfocus();
+    final choice = await showChatHistory(context, currentId: _chatId);
+    if (!mounted) return;
+    if (choice == null) {
+      // The chat on screen may have been deleted inside the sheet.
+      final id = _chatId;
+      if (id != null && !(await ChatHistory.instance.list()).any((c) => c.id == id) && mounted) _newChat();
+      return;
+    }
+    if (choice.newChat) {
+      _newChat();
+    } else {
+      _loadChat(choice.conversation!);
+    }
+  }
+
+  void _newChat() {
+    setState(() {
+      _messages.clear();
+      _chatId = null;
+      _typed = [];
+      _dismissed.clear();
+      _input.clear();
+    });
+  }
+
+  void _loadChat(Conversation c) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _messages
+        ..clear()
+        ..addAll(c.messages.map(ChatMessage.fromSaved));
+      _chatId = c.id;
+      _typed = [];
+      _dismissed.clear();
+    });
   }
 
   String? _lastExchange() {
@@ -201,79 +281,140 @@ class _ChatScreenState extends State<ChatScreen> {
     return _messages.where((m) => m.topics.intersection(_activeTopics).isNotEmpty).toList();
   }
 
+  /// Back closes the mic or the topic filter before it offers to exit.
+  bool _handleBack() {
+    if (_voice.phase == VoicePhase.recording) {
+      _voice.cancel();
+      return true;
+    }
+    if (_typed.isNotEmpty) {
+      setState(() {
+        _dismissed.addAll(_typed.map((t) => t.id));
+        _typed = [];
+      });
+      return true;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final filtering = _activeTopics.isNotEmpty;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 16,
-        title: Row(children: [
-          const KLogo(size: 30),
-          const SizedBox(width: 10),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('LakbAI'),
-            const AiStatusPill(),
+    return BackToExit(
+      onBack: _handleBack,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          titleSpacing: 16,
+          title: Row(children: [
+            const KLogo(size: 30),
+            const SizedBox(width: 10),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('LakbAI'),
+              const AiStatusPill(),
+            ]),
           ]),
-        ]),
-        toolbarHeight: 66,
-        actions: [
-          IconButton(
-            tooltip: tr(context, 'My saved cases', 'Mga naitalang kaso'),
-            onPressed: () => openPage(context, const CasesScreen()),
-            icon: const Icon(Icons.folder_outlined),
-          ),
-          IconButton(
-            tooltip: tr(context, 'Settings', 'Settings'),
-            onPressed: () => openPage(context, const SettingsScreen()),
-            icon: const Icon(Icons.settings_outlined),
-          ),
-          IconButton(
-            tooltip: tr(context, 'Quick exit', 'Mabilis na labas'),
-            onPressed: () {
-              HapticFeedback.heavyImpact();
-              SystemNavigator.pop();
-            },
-            icon: Icon(Icons.logout_rounded, color: KTokens.of(context).danger),
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
-      body: SafeArea(
-        top: false,
-        child: Column(children: [
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: Motion.d(context, 300),
-              switchInCurve: Curves.easeOutCubic,
-              transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
-              child: _messages.isEmpty && !filtering
-                  ? _Welcome(key: const ValueKey('welcome'), onAsk: _send)
-                  : _MessageList(
-                      key: ValueKey('list-$filtering'),
-                      messages: _visible,
-                      filterTopics: _typed,
-                      controller: _scroll,
-                    ),
+          toolbarHeight: 66,
+          actions: [
+            IconButton(
+              tooltip: tr(context, 'Chat history', 'Mga nakaraang chat'),
+              onPressed: _generating ? null : _openHistory,
+              icon: const Icon(Icons.history_rounded),
+            ),
+            IconButton(
+              tooltip: tr(context, 'My saved cases', 'Mga naitalang kaso'),
+              onPressed: () => openPage(context, const CasesScreen()),
+              icon: const Icon(Icons.folder_outlined),
+            ),
+            IconButton(
+              tooltip: tr(context, 'Settings', 'Settings'),
+              onPressed: () => openPage(context, const SettingsScreen()),
+              icon: const Icon(Icons.settings_outlined),
+            ),
+            IconButton(
+              tooltip: tr(context, 'Quick exit', 'Mabilis na labas'),
+              onPressed: () {
+                HapticFeedback.heavyImpact();
+                SystemNavigator.pop();
+              },
+              icon: Icon(Icons.logout_rounded, color: KTokens.of(context).danger),
+            ),
+            const SizedBox(width: 4),
+          ],
+        ),
+        // Messages run the full height and scroll under the glass chat box.
+        body: Stack(children: [
+          const Positioned.fill(child: _Aurora()),
+          Positioned.fill(
+            child: SafeArea(
+              bottom: false,
+              child: ValueListenableBuilder<double>(
+                valueListenable: _panelHeight,
+                builder: (context, inset, _) => AnimatedSwitcher(
+                  duration: Motion.d(context, 300),
+                  switchInCurve: Curves.easeOutCubic,
+                  transitionBuilder: (c, a) => FadeTransition(opacity: a, child: c),
+                  child: _messages.isEmpty && !filtering
+                      ? _Welcome(key: const ValueKey('welcome'), onAsk: _send, bottomInset: inset)
+                      : _MessageList(
+                          key: ValueKey('list-$filtering'),
+                          messages: _visible,
+                          filterTopics: _typed,
+                          controller: _scroll,
+                          bottomInset: inset,
+                        ),
+                ),
+              ),
             ),
           ),
-          _FilterBar(
-            topics: _typed,
-            onRemove: (t) => setState(() {
-              _dismissed.add(t.id);
-              _typed = _typed.where((x) => x.id != t.id).toList();
-            }),
-          ),
-          if (_danger) const Padding(padding: EdgeInsets.fromLTRB(12, 0, 12, 8), child: EmergencyBanner()),
-          _QuickActions(topics: _activeTopics),
-          _Composer(
-            controller: _input,
-            focus: _focus,
-            voice: _voice,
-            generating: _generating,
-            onSend: () => _send(),
-            onStop: AiService.instance.stop,
-            onMic: _startVoice,
-            onVoiceDone: _finishVoice,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _MeasureHeight(
+              onChange: (h) => _panelHeight.value = h,
+              child: DecoratedBox(
+                // Messages fade out under the chat box instead of being cut off.
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0, 0.4, 1],
+                    colors: [
+                      Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0),
+                      Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
+                      Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.94),
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  top: false,
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    const SizedBox(height: 18),
+                    _FilterBar(
+                      topics: _typed,
+                      onRemove: (t) => setState(() {
+                        _dismissed.add(t.id);
+                        _typed = _typed.where((x) => x.id != t.id).toList();
+                      }),
+                    ),
+                    if (_danger) const Padding(padding: EdgeInsets.fromLTRB(12, 0, 12, 8), child: EmergencyBanner()),
+                    _QuickActions(topics: _activeTopics),
+                    _Composer(
+                      controller: _input,
+                      focus: _focus,
+                      voice: _voice,
+                      generating: _generating,
+                      onSend: () => _send(),
+                      onStop: AiService.instance.stop,
+                      onMic: _startVoice,
+                      onVoiceDone: _finishVoice,
+                    ),
+                  ]),
+                ),
+              ),
+            ),
           ),
         ]),
       ),
@@ -281,9 +422,58 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
+/// Soft blue and violet glows behind the chat, so the glass has colour to blur.
+class _Aurora extends StatelessWidget {
+  const _Aurora();
+
+  @override
+  Widget build(BuildContext context) {
+    final a = Theme.of(context).brightness == Brightness.dark ? 0.16 : 0.09;
+    Widget glow(Alignment at, Color c) => DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(center: at, radius: 0.9, colors: [c.withValues(alpha: a), c.withValues(alpha: 0)]),
+          ),
+        );
+    return IgnorePointer(
+      child: Stack(fit: StackFit.expand, children: [
+        glow(const Alignment(-1, -0.9), KColors.blue),
+        glow(const Alignment(1.1, 0.1), KColors.purple),
+      ]),
+    );
+  }
+}
+
+/// Reports its child's height after layout, so the list can leave room for the chat box.
+class _MeasureHeight extends SingleChildRenderObjectWidget {
+  const _MeasureHeight({required this.onChange, super.child});
+  final ValueChanged<double> onChange;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => _RenderMeasureHeight(onChange);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderMeasureHeight renderObject) => renderObject.onChange = onChange;
+}
+
+class _RenderMeasureHeight extends RenderProxyBox {
+  _RenderMeasureHeight(this.onChange);
+  ValueChanged<double> onChange;
+  double? _last;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    final h = size.height;
+    if (h == _last) return;
+    _last = h;
+    WidgetsBinding.instance.addPostFrameCallback((_) => onChange(h));
+  }
+}
+
 class _Welcome extends StatelessWidget {
-  const _Welcome({super.key, required this.onAsk});
+  const _Welcome({super.key, required this.onAsk, required this.bottomInset});
   final void Function(String) onAsk;
+  final double bottomInset;
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +487,7 @@ class _Welcome extends StatelessWidget {
       (Icons.event_outlined, const Color(0xFFE37400), tr(context, 'Is it too late to file a complaint?', 'Huli na ba para magsampa ng reklamo?')),
     ];
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      padding: EdgeInsets.fromLTRB(20, 8, 20, 16 + bottomInset),
       children: [
         GradientGreeting(
           tr(context, 'Kumusta, kabayan.', 'Kumusta, kabayan.'),
@@ -306,7 +496,7 @@ class _Welcome extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           tr(context, 'How can I help with your contract today?', 'Paano kita matutulungan sa kontrata mo ngayon?'),
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: cs.onSurfaceVariant.withValues(alpha: 0.75), fontSize: 24, height: 1.25),
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: cs.onSurfaceVariant, fontSize: 24, height: 1.25),
         ).animate().fadeIn(duration: d, delay: 80.ms).slideY(begin: 0.15, curve: Curves.easeOutCubic),
         const SizedBox(height: 22),
         // Main tool, with an illustration of what it does.
@@ -327,7 +517,7 @@ class _Welcome extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         tr(context, 'Scan the verified contract and the new one. I will find every change.', 'I-scan ang verified na kontrata at ang bago. Hahanapin ko ang bawat pagbabago.'),
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.88), fontSize: 13.5, height: 1.35),
+                        style: TextStyle(color: Colors.white.withValues(alpha: 0.96), fontSize: 13.5, height: 1.35),
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -443,10 +633,11 @@ class _Welcome extends StatelessWidget {
 }
 
 class _MessageList extends StatelessWidget {
-  const _MessageList({super.key, required this.messages, required this.filterTopics, required this.controller});
+  const _MessageList({super.key, required this.messages, required this.filterTopics, required this.controller, required this.bottomInset});
   final List<ChatMessage> messages;
   final List<Topic> filterTopics;
   final ScrollController controller;
+  final double bottomInset;
 
   @override
   Widget build(BuildContext context) {
@@ -476,7 +667,7 @@ class _MessageList extends StatelessWidget {
     return ListView(
       controller: controller,
       reverse: true,
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: EdgeInsets.only(top: 12, bottom: 12 + bottomInset),
       children: items.reversed.toList(),
     );
   }
@@ -525,13 +716,17 @@ class _UserBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final fil = AppScope.of(context).isFil;
     final bubble = Container(
       constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
       padding: const EdgeInsets.fromLTRB(16, 11, 16, 11),
       decoration: BoxDecoration(
-        color: KTokens.of(context).userBubble,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [KTokens.of(context).userBubble, Color.lerp(KTokens.of(context).userBubble, KColors.purple, 0.45)!],
+        ),
+        boxShadow: [BoxShadow(color: KColors.blue.withValues(alpha: 0.22), blurRadius: 16, offset: const Offset(0, 6))],
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(6),
@@ -540,7 +735,7 @@ class _UserBubble extends StatelessWidget {
         ),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisSize: MainAxisSize.min, children: [
-        SelectableText(message.text.value, style: TextStyle(color: cs.onSurface, fontSize: 15.5, height: 1.45)),
+        SelectableText(message.text.value, style: const TextStyle(color: Colors.white, fontSize: 15.5, height: 1.45)),
         if (message.topics.isNotEmpty) ...[
           const SizedBox(height: 6),
           Wrap(spacing: 4, runSpacing: 4, children: [
@@ -548,8 +743,8 @@ class _UserBubble extends StatelessWidget {
               if (topicById(id) case final tp?)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(color: tp.color.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(99)),
-                  child: Text('#${tp.label(fil).toLowerCase()}', style: TextStyle(color: tp.color, fontSize: 11, fontWeight: FontWeight.w600)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(99)),
+                  child: Text('#${tp.label(fil).toLowerCase()}', style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w600)),
                 ),
           ]),
         ],
@@ -580,23 +775,26 @@ class _AiReply extends StatelessWidget {
     final body = ValueListenableBuilder<String>(
       valueListenable: message.text,
       builder: (context, text, _) {
-        final waiting = text.isEmpty && message.streaming;
-        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (text.isEmpty && message.streaming) {
+          // The laws in the prompt are known before the first word, so say which ones it is reading.
+          final reading = sources.map((e) => e.title(fil)).join(', ');
+          return _swap(
+            context,
+            ThinkingIndicator(
+              key: const ValueKey('thinking'),
+              label: tr(context, 'Thinking…', 'Nag-iisip…'),
+              detail: reading.isEmpty ? tr(context, 'Reading your question', 'Binabasa ang tanong mo') : tr(context, 'Reading: $reading', 'Binabasa: $reading'),
+            ),
+          );
+        }
+        return _swap(context, Column(key: const ValueKey('answer'), crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             AiSpark(size: 22, busy: message.streaming),
             const SizedBox(width: 10),
-            Text(
-              waiting ? tr(context, 'Thinking…', 'Nag-iisip…') : answeredBy(context, message.byAi),
-              style: TextStyle(fontSize: 12.5, color: cs.onSurfaceVariant, fontWeight: FontWeight.w500),
-            ),
+            Text(answeredBy(context, message.byAi), style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant, fontWeight: FontWeight.w600)),
           ]),
           const SizedBox(height: 10),
-          AnimatedSize(
-            duration: Motion.d(context, 200),
-            alignment: Alignment.topLeft,
-            curve: Curves.easeOutCubic,
-            child: waiting ? const ThinkingShimmer() : SelectionArea(child: MarkdownText(text)),
-          ),
+          SelectionArea(child: MarkdownText(text)),
           if (!message.streaming && sources.isNotEmpty) ...[
             const SizedBox(height: 14),
             SizedBox(
@@ -627,12 +825,25 @@ class _AiReply extends StatelessWidget {
                 ),
               ]),
             ),
-        ]);
+        ]));
       },
     );
-    return _enter(context, message, Padding(padding: const EdgeInsets.fromLTRB(16, 10, 16, 6), child: body), user: false);
+    final animated = AnimatedSize(
+      duration: Motion.d(context, 260),
+      alignment: Alignment.topLeft,
+      curve: Curves.easeOutCubic,
+      child: body,
+    );
+    return _enter(context, message, Padding(padding: const EdgeInsets.fromLTRB(16, 10, 16, 6), child: animated), user: false);
   }
 }
+
+/// Cross-fades the "Thinking…" row into the answer when the first word arrives.
+Widget _swap(BuildContext context, Widget child) => AnimatedSwitcher(
+      duration: Motion.d(context, 240),
+      layoutBuilder: (current, previous) => Stack(alignment: Alignment.topLeft, children: [...previous, ?current]),
+      child: child,
+    );
 
 /// A cited law, shown as a small card with the topic's icon, like a search result.
 class _SourceCard extends StatelessWidget {
@@ -884,15 +1095,9 @@ class _Composer extends StatelessWidget {
         }
         return Padding(
           padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-          child: AnimatedContainer(
-            duration: dur,
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              color: cs.surfaceContainer,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: focus.hasFocus || listening ? cs.primary.withValues(alpha: 0.5) : Colors.transparent, width: 1.2),
-              boxShadow: focus.hasFocus || listening ? [BoxShadow(color: KTokens.of(context).glow, blurRadius: 24, offset: const Offset(0, 6))] : null,
-            ),
+          // The ring flows while it listens, while you type, and while the AI answers.
+          child: LiquidGlass(
+            active: focus.hasFocus || listening || writing || generating,
             child: AnimatedSize(
               duration: dur,
               curve: Curves.easeOutCubic,
@@ -921,20 +1126,34 @@ class _RoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final enabled = onTap != null;
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: filled ? (onTap == null ? cs.onSurface.withValues(alpha: 0.12) : cs.primary) : Colors.transparent,
+        type: MaterialType.transparency,
         shape: const CircleBorder(),
         clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap == null
-              ? null
-              : () {
-                  HapticFeedback.selectionClick();
-                  onTap!();
-                },
-          child: SizedBox.square(dimension: 44, child: Icon(icon, size: 24, color: filled ? cs.onPrimary : cs.onSurfaceVariant)),
+        child: Ink(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: filled && !enabled ? cs.onSurface.withValues(alpha: 0.12) : null,
+            gradient: filled && enabled
+                ? const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF0B57D0), Color(0xFF6A45C2)])
+                : null,
+          ),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: !enabled
+                ? null
+                : () {
+                    HapticFeedback.selectionClick();
+                    onTap!();
+                  },
+            child: SizedBox.square(
+              dimension: 44,
+              child: Icon(icon, size: 24, color: filled ? (enabled ? Colors.white : cs.onSurface.withValues(alpha: 0.38)) : cs.onSurfaceVariant),
+            ),
+          ),
         ),
       ),
     );
