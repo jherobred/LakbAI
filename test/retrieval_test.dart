@@ -64,7 +64,54 @@ const _cases = <String, List<String>>{
   'pinilit akong mangutang sa lending ng agency': ['loans_deductions'],
 };
 
+/// Fresh phrasings that were not used to pick keywords, to measure how well search generalizes.
+/// The committed knowledge base before this set existed scored 12/26.
+const _heldOut = <String, List<String>>{
+  'hawak ng employer ko ang passport ko, bawal ba yun': ['withholding_documents', 'passport_abroad', 'country_uae_domestic', 'country_kw_domestic'],
+  'can my employer keep my iqama': ['withholding_documents', 'passport_abroad', 'country_ksa_domestic', 'country_ksa_musaned'],
+  'mas maliit ang sahod sa bagong kontrata': ['substitution_definition', 'first_steps_substitution', 'renegotiated_terms', 'what_to_compare'],
+  'my agency is charging me 50,000 pesos': ['fees_hsw', 'recruiter_red_flags', 'loans_deductions'],
+  'pinapatrabaho ako ng 18 oras': ['hsw_rest'],
+  'I work every day with no rest': ['hsw_rest'],
+  'binubugbog ako ng amo ko, tulungan niyo ako': ['abuse_help', 'hotline_1343', 'ran_away_shelter'],
+  'my boss hits me': ['abuse_help', 'hotline_1343'],
+  'gusto ko nang umuwi pero ayaw ng amo ko': ['repatriation', 'ran_away_shelter'],
+  'hindi ako binigyan ng sahod ngayong buwan': ['unpaid_wages'],
+  'my salary has been delayed for two months': ['unpaid_wages'],
+  'paano mag file ng kaso laban sa agency': ['where_home', 'criminal_case', 'agency_joint_liability'],
+  'how do I report an illegal recruiter': ['criminal_case', 'recruiter_red_flags', 'hotline_1343'],
+  'nagkasakit ako dito sa saudi': ['compulsory_insurance', 'abuse_help'],
+  'what benefits does owwa give': ['owwa_membership'],
+  'kinuha nila ang cellphone ko': ['phone_privacy', 'abuse_help'],
+  'na-terminate ako sa hong kong, ano ang gagawin ko': ['country_hk_two_week', 'illegal_dismissal_pay'],
+  'sabi ng recruiter tourist visa lang daw': ['recruiter_red_flags', 'trafficking'],
+  'I signed a new contract at the airport': ['pressure_to_sign', 'renegotiated_terms'],
+  'pwede ba akong magreklamo kahit nandito pa ako': ['where_abroad', 'ladder_overview'],
+  'paid leave for maids in dubai': ['country_uae_domestic'],
+  'the employer did not give me food for days': ['abuse_help', 'hsw_free_board'],
+  'ilang oras ang trabaho sa qatar': ['country_qa_domestic'],
+  'magkano ang singil ng agency sa hongkong': ['country_hk_agency_fee'],
+  'overstaying ako, matutulungan pa ba ng embassy': ['undocumented_help'],
+  'is there free legal help for OFWs': ['aksyon_fund', 'undocumented_help'],
+};
+
+List<String> _misses(KnowledgeBase kb, Map<String, List<String>> cases) => [
+      for (final c in cases.entries)
+        if (!kb
+            .search(c.key, topics: KeywordDetector.instance.topicsIn(c.key).map((t) => t.id).toSet(), k: 2)
+            .any((e) => c.value.contains(e.id)))
+          c.key,
+    ];
+
 void main() {
+  test('held-out questions stay at or above 24/26', () {
+    final kb = KnowledgeBase.parse(File('assets/kb/knowledge.json').readAsStringSync());
+    final misses = _misses(kb, _heldOut);
+    // ignore: avoid_print
+    print('held-out top-2 hits: ${_heldOut.length - misses.length}/${_heldOut.length}, missed: $misses');
+    expect(_heldOut.length - misses.length, greaterThanOrEqualTo(24));
+  });
+
   test('chat retrieval puts an answering entry in the top 2', () {
     final kb = KnowledgeBase.parse(File('assets/kb/knowledge.json').readAsStringSync());
     final misses = <String>[];
