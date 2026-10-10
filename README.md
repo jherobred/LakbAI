@@ -26,7 +26,7 @@ LakbAI covers three gaps:
 ## Why this product benefits from running AI locally
 
 - **The moment of substitution is offline.** It happens at an agency desk or on arrival abroad, where the worker may have no local SIM, no data and no Wi-Fi. LakbAI works in airplane mode.
-- **The phone may be watched.** Employers sometimes check or take workers' phones. Nothing is uploaded, so there is no cloud account, chat log or server copy to find. The app has a PIN lock and a one-tap quick exit.
+- **The phone may be watched.** Employers sometimes check or take workers' phones. Nothing is uploaded, so there is no cloud account or server copy to find. Saved chats stay on the phone behind a PIN lock, and the worker can delete one chat or all of them. A one-tap quick exit closes the app.
 - **The documents are sensitive.** Contracts carry passport numbers, employer names and salaries. Sending them to a cloud AI would hand that data to a third party.
 - **It is free to use.** On-device inference costs nothing per scan or question, which matters for low-income workers.
 

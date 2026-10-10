@@ -36,7 +36,7 @@ Paste each answer into the matching field. Deadline: 10:00 AM, 10 October 2026.
 
 ## Why does this product benefit from running AI locally?
 
-Contract substitution happens at an agency desk or on arrival abroad. There the worker may have no SIM, no data or Wi-Fi, and an employer who checks their phone. LakbAI's language model, speech recognition and text recognition run on the device in airplane mode. The contracts, which carry passport numbers and salaries, never leave the phone, and there is no cloud account or chat log to find. On-device inference also makes every scan and question free for low-income workers.
+Contract substitution happens at an agency desk or on arrival abroad. There the worker may have no SIM, no data or Wi-Fi, and an employer who checks their phone. LakbAI's language model, speech recognition and text recognition run on the device in airplane mode. The contracts, which carry passport numbers and salaries, never leave the phone, and there is no cloud account or server copy to find. Saved chats stay on the phone behind a PIN lock, and the worker can delete one chat or all of them. On-device inference also makes every scan and question free for low-income workers.
 
 ## Demo video plan (~1 minute)
 
