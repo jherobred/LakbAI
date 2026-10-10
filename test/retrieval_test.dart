@@ -126,6 +126,15 @@ void main() {
     expect(misses, isEmpty);
   });
 
+  test('"leave" meaning to depart does not pull in the vacation-leave entry', () {
+    final kb = KnowledgeBase.parse(File('assets/kb/knowledge.json').readAsStringSync());
+    for (final q in ['the recruiter told me to leave as a tourist', 'I want to leave my employer']) {
+      final topics = KeywordDetector.instance.topicsIn(q).map((t) => t.id).toSet();
+      expect(topics.contains('leave'), isFalse, reason: q);
+      expect(kb.search(q, topics: topics, k: 2).map((e) => e.id), isNot(contains('hsw_leave')), reason: q);
+    }
+  });
+
   test('every entry is complete and every id is unique', () {
     final kb = KnowledgeBase.parse(File('assets/kb/knowledge.json').readAsStringSync());
     final ids = kb.entries.map((e) => e.id).toList();

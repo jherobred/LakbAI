@@ -51,7 +51,9 @@ const kTopics = <Topic>[
     'recruiter', 'handler', 'illegal recruiter', 'illegal recruitment', 'scam', 'budol', 'fixer', 'na-scam'
   ]),
   Topic('trafficking', 'Trafficking', 'Trafficking', Icons.warning_rounded, Color(0xFFE11D48), [
-    'trafficking', 'trafficked', 'tourist visa', 'backdoor', 'escort', 'ibinenta', 'forced labor', 'sapilitan'
+    'trafficking', 'trafficked', 'tourist visa', 'backdoor', 'escort', 'ibinenta', 'forced labor', 'sapilitan',
+    // "Leave" here means departing, so these phrases must win over the Leave topic.
+    'leave as a tourist', 'leave as tourist', 'leave on a tourist visa'
   ]),
   Topic('abuse', 'Abuse', 'Pang-aabuso', Icons.report_rounded, Color(0xFFE11D48), [
     'abuse', 'abused', 'binugbog', 'sinaktan', 'sinampal', 'pinalo', 'maltrato', 'harassment', 'hinipuan',
@@ -70,7 +72,8 @@ const kTopics = <Topic>[
   ]),
   Topic('help', 'Get help', 'Tulong', Icons.support_agent_rounded, Color(0xFF16A34A), [
     'help', 'tulong', 'tulungan', 'saklolo', 'emergency', 'hotline', '1348', '1343', 'embassy', 'embahada',
-    'konsulado', 'shelter', 'owwa', 'tumakas', 'ran away', 'umalis sa amo', 'walang papeles', 'undocumented'
+    'konsulado', 'shelter', 'owwa', 'tumakas', 'ran away', 'umalis sa amo', 'walang papeles', 'undocumented',
+    'leave my employer'
   ]),
   Topic('repatriation', 'Going home', 'Pag-uwi', Icons.flight_land_rounded, Color(0xFF0D9488), [
     'uwi', 'umuwi', 'pauwi', 'makauwi', 'repatriation', 'ticket', 'flight', 'airfare', 'pamasahe'
