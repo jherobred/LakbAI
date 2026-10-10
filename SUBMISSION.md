@@ -18,21 +18,21 @@ Paste each answer into the matching field. Deadline: 10:00 AM, 10 October 2026.
 
 **X / LinkedIn video URL:** _paste the post link here_.
 
-**What runs locally:** the language model (Qwen3 0.6B built in, Gemma 4 E2B optional, via LiteRT-LM), speech-to-text (Whisper base built in, Whisper tiny optional), contract text recognition (Google ML Kit, bundled model), clause comparison and minimum-standard checks, legal knowledge search over a 47-entry cited knowledge base, and PDF incident report generation.
+**What runs locally:** the language model (Qwen3 0.6B built into the installer, or optional Qwen3 0.6B full and Gemma 4 E2B, all via LiteRT-LM), speech-to-text (Whisper base built in, Whisper tiny optional), contract text recognition (Google ML Kit, bundled model), clause comparison and minimum-standard checks (a rule engine in Dart), legal knowledge search over a 47-entry cited knowledge base, PDF incident report generation, and saved chat history. Everything works in airplane mode from the first launch.
 
-**What requires internet:** nothing for the core app, since the AI and voice models ship inside the installer and it works in airplane mode from the first launch. Optional bigger models download once from Hugging Face. Calling hotlines needs mobile signal, and sharing a report needs a connection only when the worker chooses to share.
+**What requires internet:** nothing for the core app. Optional bigger models download once from Hugging Face. Calling the 1348/1343 hotlines needs mobile signal, and sharing a report needs a connection only when the worker chooses to share.
 
 ## The disclosures
 
-**Models used:** Qwen3 0.6B (Alibaba Qwen, Apache-2.0), Gemma 4 E2B (Google, Apache-2.0), Whisper base and tiny (OpenAI, MIT), all as LiteRT conversions by litert-community. Google ML Kit Text Recognition v2 (Latin script, bundled on-device model).
+**Models used:** Qwen3 0.6B (Alibaba Qwen, Apache-2.0), Gemma 4 E2B (Google, Apache-2.0), Whisper base and tiny (OpenAI, MIT), all as LiteRT conversions by litert-community on Hugging Face. Google ML Kit Text Recognition v2 (Latin script, bundled on-device model).
 
-**Technologies and frameworks:** Flutter and Dart; flutter_edge_ai, flutter_edge_ai_litertlm and flutter_edge_ai_speech (LiteRT-LM runtime); google_mlkit_text_recognition; camera; image_picker; record; pdf; share_plus; flutter_animate; animations; shared_preferences; path_provider; crypto; url_launcher; file_picker. GitHub Actions builds the iOS app.
+**Technologies and frameworks:** Flutter and Dart; flutter_edge_ai, flutter_edge_ai_litertlm and flutter_edge_ai_speech (LiteRT-LM runtime); google_mlkit_text_recognition; camera; image_picker; record; pdf; share_plus; flutter_animate; animations; shared_preferences; path_provider; crypto; url_launcher; file_picker; flutter_launcher_icons (app icon). GitHub Actions builds the iOS app, and GitHub Releases hosts the installers.
 
-**APIs and cloud services:** Hugging Face, only to fetch model files at build time and for the optional bigger models. No other cloud services, no analytics, no accounts and no telemetry.
+**APIs and cloud services:** Hugging Face only, to fetch model files at build time and for the optional bigger models. No other cloud services, no analytics, no accounts and no telemetry.
 
-**Existing code and assets:** Flutter's app template. The WAV-to-PCM helper follows the flutter_edge_ai speech documentation. The legal knowledge base, the app icon and the synthetic sample contracts (marked "SAMPLE ONLY") were made during the hackathon.
+**Existing code and assets:** Flutter's app template. The WAV-to-PCM helper follows the flutter_edge_ai speech documentation. The legal knowledge base, the synthetic sample contracts (marked "SAMPLE ONLY") and the LakbAI logo were made by the team during the hackathon.
 
-**AI development tools:** Claude Code (Anthropic), used for ideation, prior-art research and writing code during the hackathon.
+**AI development tools:** Claude Code (Anthropic), used for ideation, prior-art research, writing code and preparing the demo video during the hackathon.
 
 ## Why does this product benefit from running AI locally?
 
