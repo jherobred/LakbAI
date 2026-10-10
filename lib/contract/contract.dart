@@ -595,5 +595,20 @@ List<Discrepancy> compareContracts(ContractTerms verified, ContractTerms current
   return out;
 }
 
-String diffSummaryForModel(List<Discrepancy> d) =>
-    d.where((x) => x.severity != Severity.better).map((x) => '- ${x.titleEn}: was ${x.before}, now ${x.after}').join('\n');
+/// The changes as a small model reads them best: "before, now" for values, and
+/// the plain note for yes/no clauses ("was None, now Present" got misread).
+/// Advisory checks and repeats of the same before/after are left out.
+String diffSummaryForModel(List<Discrepancy> d) {
+  const flags = {'Yes', 'No', 'None', 'Present'};
+  final seen = <String>{};
+  final out = <String>[];
+  for (final x in d) {
+    if (x.severity == Severity.better || x.severity == Severity.info || !seen.add('${x.before}>${x.after}')) continue;
+    if (flags.contains(x.before) || flags.contains(x.after)) {
+      out.add('- ${x.titleEn}. ${x.noteEn.split('. ').first.replaceAll(RegExp(r'\.$'), '')}.');
+    } else {
+      out.add('- ${x.titleEn}: ${x.before} before, ${x.after} now.');
+    }
+  }
+  return out.join('\n');
+}

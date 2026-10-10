@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kontrata/ai/ai_service.dart';
 import 'package:kontrata/ai/prompts.dart';
+import 'package:kontrata/contract/contract.dart';
 
 // Replies below are real Qwen3 0.6B outputs (LM Studio, q4_k_m) for the app's prompts.
 void main() {
@@ -60,5 +61,33 @@ void main() {
     expect(p, isNot(contains('EARLIER')));
     // Qwen3 0.6B is the default model and answers in English.
     expect(p.trim().split('\n').last, startsWith('Reply in simple English'));
+  });
+
+  test('cleanModelText drops a copied instruction line and a "Source: Law from CONTEXT" line', () {
+    const raw = '- In simple English: One short sentence that answers the question, then up to 3 bullet points that start with "- ".\n'
+        '- Keep copies of both contracts.\n'
+        '- Source: Law from CONTEXT.';
+    expect(cleanModelText(raw), '- Keep copies of both contracts.');
+    expect(
+      cleanModelText('- One short sentence that answers the question, such as "Keep copies of both contracts."\n"Check the DMW website."'),
+      '- Keep copies of both contracts.\nCheck the DMW website.',
+    );
+    expect(
+      cleanModelText('This is illegal. The changes listed are part of your new contract, so don\'t repeat them. Decide later.'),
+      'This is illegal. Decide later.',
+    );
+  });
+
+  test('diffSummaryForModel skips advisory and repeated changes and explains yes/no clauses', () {
+    Discrepancy d(String title, String before, String after, Severity s, [String note = 'A note. More.']) =>
+        Discrepancy(field: title, titleEn: title, titleFil: title, before: before, after: after, severity: s, noteEn: note, noteFil: note);
+    final summary = diffSummaryForModel([
+      d('Less daily rest', '8 h', '6 h', Severity.high),
+      d('Employer keeps your passport', 'None', 'Present', Severity.high, 'Holding a worker\'s passport is a major warning sign. Before departure it is illegal.'),
+      d('Less than 8 hours of daily rest', '8 h', '6 h', Severity.high),
+      d('Below the DMW standard', 'US\$500', 'USD 400', Severity.info),
+      d('More leave', '7 days', '15 days', Severity.better),
+    ]);
+    expect(summary, "- Less daily rest: 8 h before, 6 h now.\n- Employer keeps your passport. Holding a worker's passport is a major warning sign.");
   });
 }

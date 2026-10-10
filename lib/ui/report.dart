@@ -64,7 +64,15 @@ class _ReportScreenState extends State<ReportScreen> {
   Future<void> _polish() async {
     final raw = _statement.text.trim();
     if (raw.isEmpty || !AiService.instance.ready) return;
-    final fil = AppScope.read(context).isFil;
+    // Rewrite in the language the worker used, not the app's language.
+    final fil = looksFilipino(raw, fallback: AppScope.read(context).isFil);
+    if (fil && !AiService.instance.writesFilipino) {
+      // Qwen3 0.6B changed facts when rewriting Filipino, so keep the worker's own words.
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(tr(context, 'Your statement is kept in your own words. The built-in AI cannot rewrite Filipino safely.',
+              'Iniwan ang salaysay sa sarili mong salita. Hindi ito kayang ayusin nang tama ng built-in na AI sa Filipino.'))));
+      return;
+    }
     setState(() => _polishing = true);
     try {
       final out = await AiService.instance.complete(

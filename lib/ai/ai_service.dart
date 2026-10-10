@@ -330,7 +330,8 @@ class AiService extends ChangeNotifier {
     try {
       _chat = await _model!.createChat(
         systemInstruction: system,
-        temperature: 0.3,
+        // Low: at 0.3 Qwen3 0.6B got the passport owner wrong 1 time in 5, at 0.1 never.
+        temperature: 0.1,
         topK: 24,
         maxOutputTokens: maxOutputTokens,
         enableThinking: false,
@@ -442,6 +443,11 @@ class AiService extends ChangeNotifier {
 final _sourceLine = RegExp(r'^\s*(?:[-*•]\s*)?\**\s*(?:source|sources|pinagmulan|batayan)\s*\**\s*:\s*\**\s*"?(.*?)[\s*"]*$', caseSensitive: false);
 final _trailingSource = RegExp(r'^(.*[.!?])\s+\**source\**\s*:\s*(.+)$', caseSensitive: false);
 final _doubleBullet = RegExp(r'^(\s*)[-*•]\s+["“]?[-*•]\s+');
+// A whole line copied from the format instruction at the end of the prompt.
+final _instructionLine = RegExp(r'answers the question, then|up to 3 bullet points|law named in context', caseSensitive: false);
+final _repeatEcho = RegExp(r"\s*[^.!?\s][^.!?]*\b(?:don't|do not) repeat them\b[^.!?]*[.!?]?", caseSensitive: false);
+final _suchAs = RegExp(r'one short sentence that answers the question,?\s*(?:such as|like)\s*:?\s*', caseSensitive: false);
+final _quotedLine = RegExp(r'^(\s*(?:[-*•]\s+)?)["“]([^"“”]+)["”]\.?\s*$');
 final _echo = RegExp(
     r'^(\s*(?:[-*•]|\d+\.)\s+)?\**\s*(?:one short sentence(?: that answers(?: the question)?)?|bold(?: numbers)?|last line|bullet points?(?: (?:that )?start(?:s|ing)? with "- ")?)\s*\**\s*(?::\s*\**\s*|$)',
     caseSensitive: false);
@@ -458,8 +464,10 @@ String cleanModelText(String s) {
   String? source;
   for (var line in t.split('\n')) {
     final blank = line.trim().isEmpty;
+    if (_instructionLine.hasMatch(line)) continue;
     line = line.replaceFirstMapped(_doubleBullet, (m) => '${m[1]}- ');
-    line = line.replaceFirstMapped(_echo, (m) => m[1] ?? '');
+    line = line.replaceFirst(_suchAs, '').replaceAll(_repeatEcho, '').replaceFirstMapped(_echo, (m) => m[1] ?? '');
+    line = line.replaceFirstMapped(_quotedLine, (m) => '${m[1]}${m[2]}');
     // Nothing but bullet marks left (an echo, or "- " before an indented line).
     if (!blank && line.replaceAll(RegExp(r'[-*•\s]'), '').isEmpty) continue;
     // A bullet the model wrapped in quotes often loses its opening quote.
@@ -472,7 +480,7 @@ String cleanModelText(String s) {
     final src = _sourceLine.firstMatch(line);
     if (src != null) {
       final law = src[1]!.trim();
-      if (law.isNotEmpty && !law.contains('<')) source ??= law;
+      if (law.isNotEmpty && !law.contains('<') && !law.toLowerCase().contains('context')) source ??= law;
       continue;
     }
     if (line.trim().isNotEmpty && kept.any((k) => _nearDuplicate(k, line))) continue;

@@ -77,16 +77,18 @@ String extractiveAnswer(List<KbEntry> entries, {required bool fil}) {
   return b.toString().trim();
 }
 
+/// Small models flip facts when they restate numbers ("shortened from 2 to 3
+/// years"), so the model explains the meaning and the screen lists the changes.
 String explainChangesPrompt({required String diffSummary, required bool fil}) => '''
 CONTEXT:
-- Changing a DMW-verified contract to the worker's disadvantage without DMW approval is illegal (Labor Code Art. 34(i); RA 8042 Sec. 6).
+- Only the DMW can approve changes to a verified contract. A change that hurts the worker without DMW approval is illegal (Labor Code Art. 34(i); RA 8042 Sec. 6).
 - The Philippine agency stays jointly liable for money claims even if the contract was changed abroad (RA 8042 Sec. 10).
 - Money claims can be filed within 3 years (Labor Code Art. 306).
 
 CHANGES FOUND BETWEEN THE VERIFIED CONTRACT AND THE NEW ONE:
 $diffSummary
 
-Explain to the worker in ${_writeFil(fil) ? 'simple Filipino' : 'simple English'}, in under 110 words, what these changes mean for them. Start with one plain sentence, then short "- " bullets. Be calm. Do not tell them to confront anyone. End by saying they can keep this evidence and decide later.''';
+Explain to the worker in ${_writeFil(fil) ? 'simple Filipino' : 'simple English'} what these changes mean for them, in 3 or 4 short sentences. The app already lists each change, so do not repeat them. Say that changing a verified contract without DMW approval is illegal and that the agency in the Philippines is still liable. Be calm. Do not tell them to confront anyone. End by saying they can keep this evidence and decide later.''';
 
 String statementPrompt({required String rawText, required bool fil}) => '''
 Rewrite the worker's account below as a clear, first-person statement for an incident report, in ${fil ? 'Filipino' : 'English'}.
